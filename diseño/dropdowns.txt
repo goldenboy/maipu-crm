@@ -1,0 +1,49 @@
+
+
+* Nivel:
+	- Excelente
+	- Muy buena
+	- Regular
+	- Mala
+	- Muy mala
+
+* SioNo:
+	- Si
+	- No
+
+* EstadoContacto:
+	- CONTESTADOR
+	- OCUPADO
+	- ERRONEO
+	- NO CONTESTA
+	- NO CONTESTA 2
+	- NOS LLAMARA
+	- RELLAMAR MAÑANA
+	- RELLAMAR TARDE
+	- CONTACTO REALIZADO
+
+* CantidadIntentos
+	- 0
+	- 1
+	- 2
+	- 3
+	- 4
+
+
+
+
+
+
+
+CONTACTO	- ASISTE
+		- ASISTE RECONFIRMADO
+		- NO ASISTE
+		- RELLAMAR MAÑANA
+		- RELLAMAR TARDE
+SIN CONTACTO 	- CONTESTADOR
+		- ERRONEO
+		- NO CONTESTA
+		- NO CONTESTA 2
+		- OCUPADO
+		- RELLAMAR MAÑANA
+		- RELLAMAR TARDE

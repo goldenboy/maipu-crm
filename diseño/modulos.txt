@@ -1,0 +1,31 @@
+
+Clientes
+========
+Usamos el módulo built-in de Sugar "Contactos" y le agregamos algunos campos
+apropiados para el caso de Maipú:
+- INT(11) id_maipu 
+- INT(9) dni
+
+
+Autos
+=====
+* Marcas: (sin pestaña)
+	- INT(2) id_marca_maipu
+	- CHAR(30) desc_marca
+* Modelos: (sin pestaña)
+	- INT(2) id_marca_maipu
+	- CHAR(4) id_modelo_maipu
+	- CHAR(50) desc_modelo
+	- CHECKBOX premium
+	
+
+
+Encuestas
+=========
+(todas las encuestas tienen un campo dropdown con el estado del contacto, un
+selector con la cantidad de intentos de intentos realizados, y un campo de texto
+para agregar notas)
+* Enc_marketing (sin pestaña)
+* Enc_sat_venta (sin pestaña)
+* Enc_sat_servicios (sin pestaña)
+
