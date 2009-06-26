@@ -3,19 +3,19 @@ Clientes
 ========
 Usamos el módulo built-in de Sugar "Contactos" y le agregamos algunos campos
 apropiados para el caso de Maipú:
-- INT(11) id_maipu 
-- INT(9) dni
+- INT(11) id_maipu_c
+- INT(9) dni_c
 
 
 Autos
 =====
 * Marcas: (sin pestaña)
-	- INT(2) id_marca_maipu
-	- CHAR(30) desc_marca
+	- INT(2) id_marca_maipu: requerido
+	- CHAR(30) desc_marca: requerido
 * Modelos: (sin pestaña)
-	- INT(2) id_marca_maipu
-	- CHAR(4) id_modelo_maipu
-	- CHAR(50) desc_modelo
+	- INT(2) id_marca_maipu: requerido
+	- CHAR(4) id_modelo_maipu: requerido
+	- CHAR(50) desc_modelo: requerido
 	- CHECKBOX premium
 	
 
@@ -27,5 +27,44 @@ selector con la cantidad de intentos de intentos realizados, y un campo de texto
 para agregar notas)
 * Enc_marketing (sin pestaña)
 * Enc_sat_venta (sin pestaña)
+	- nivel_satisfaccion_list grado_satisfaccion ("¿Cuál es su grado de
+		satisfacción con la experiencia de compra en la concesionaria?")
+	--- Satisfacción con respecto al vendedor ---
+	- nivel_satisfaccion_list grado_satisfaccion_v ("¿Cuál es su grado de
+		satisfacción con respecto al vendedor?")
+	- respuesta_si_no_list profesionalismo_cortesia ("¿Estuvo satisfecho con
+		el profesionalismo y cortesía del vendedor?")
+	- respuesta_si_no_list conocimiento_productos ("¿El vendedor demostró
+		conocimiento sobre los productos?")
+	- respuesta_si_no_list sinceridad_honestidad ("¿El vendedor fue sincero
+		y honesto?")
+	- respuesta_si_no_list servicios_financieros ("¿Se le ofreció algún
+		tipo de servicio financiero?")
+	- respuesta_si_no_list prueba_manejo ("¿Se le ofreció prueba de
+		manejo?")
+	--- Satisfacción con el responsable de entrega ---
+	- nivel_satisfaccion_list grado_satisfaccion_e ("¿Cuál es su grado de
+		satisfacción con la persona responsable de la entrega del
+		auto?")
+	- respuesta_si_no_list condiciones_vehiculo ("¿Su unidad se encontraba
+		limpia y en condiciones?")
+	- respuesta_si_no_list funcionamiento_vehiculo ("¿Se le informó sobre el
+		correcto funcionamiento del automóvil?")
+	- respuesta_si_no_list garantia_mantenimiento ("¿Se le informó sobre la
+		garantía y el plan de mantenimiento?")
+	- respuesta_si_no_list departamento_servicios ("¿Se le informó cómo
+		contactarse con el departamento de servicios?")
+	--- Satisfacción de gestoría y trámites ---
+	- nivel_satisfaccion_list grado_satisfaccion_g ("¿Cuál es su grado de
+		satisfacción con la persona responsable de gestoría y
+		trámites?")
+	- respuesta_si_no_list amabilidad_cortesia ("¿Al momento de la atención
+		fueron amables y corteses?")
+	- respuesta_si_no_list agilidad ("¿Fue un trámite rápido?")
+	- respuesta_si_no_list puntualidad ("Con respecto al trámite, ¿se
+		respetaron el turno y hora pactados?")
+	--- Observaciones adicionales ---
+	- textarea comentarios
+	
 * Enc_sat_servicios (sin pestaña)
 
