@@ -1,3 +1,9 @@
+50
+20
+
+10
+10
+
 
 Clientes
 ========
@@ -22,11 +28,12 @@ Autos
 
 Encuestas
 =========
-(todas las encuestas tienen un campo dropdown con el estado del contacto, un
-selector con la cantidad de intentos de intentos realizados, y un campo de texto
-para agregar notas)
+(todas las encuestas tienen un campo dropdown con el estado del contacto
+[estado_contacto], un selector con la cantidad de intentos realizados
+[cantidad_intentos], y un campo de texto para agregar notas [notas])
 * Enc_marketing (sin pestaña)
 * Enc_sat_venta (sin pestaña)
+	--- Satisfacción con la experiencia de compra ---
 	- nivel_satisfaccion_list grado_satisfaccion ("¿Cuál es su grado de
 		satisfacción con la experiencia de compra en la concesionaria?")
 	--- Satisfacción con respecto al vendedor ---
@@ -42,7 +49,7 @@ para agregar notas)
 		tipo de servicio financiero?")
 	- respuesta_si_no_list prueba_manejo ("¿Se le ofreció prueba de
 		manejo?")
-	--- Satisfacción con el responsable de entrega ---
+	--- Satisfacción con respecto al responsable de entrega ---
 	- nivel_satisfaccion_list grado_satisfaccion_e ("¿Cuál es su grado de
 		satisfacción con la persona responsable de la entrega del
 		auto?")
@@ -54,7 +61,7 @@ para agregar notas)
 		garantía y el plan de mantenimiento?")
 	- respuesta_si_no_list departamento_servicios ("¿Se le informó cómo
 		contactarse con el departamento de servicios?")
-	--- Satisfacción de gestoría y trámites ---
+	--- Satisfacción con respecto a gestoría y trámites ---
 	- nivel_satisfaccion_list grado_satisfaccion_g ("¿Cuál es su grado de
 		satisfacción con la persona responsable de gestoría y
 		trámites?")
@@ -64,7 +71,7 @@ para agregar notas)
 	- respuesta_si_no_list puntualidad ("Con respecto al trámite, ¿se
 		respetaron el turno y hora pactados?")
 	--- Observaciones adicionales ---
-	- textarea comentarios
+	- comentarios
 	
 * Enc_sat_servicios (sin pestaña)
 

@@ -1,17 +1,17 @@
 
 
-* Nivel:
+* Nivel de Satisfacción: (nivel_satisfaccion_list)
 	- Excelente
 	- Muy buena
 	- Regular
 	- Mala
 	- Muy mala
 
-* SioNo:
+* RespuestaSiNo: (respuesta_si_no_list)
 	- Si
 	- No
 
-* EstadoContacto:
+* EstadoContacto: (estado_contacto_list)
 	- CONTESTADOR
 	- OCUPADO
 	- ERRONEO
@@ -22,7 +22,7 @@
 	- RELLAMAR TARDE
 	- CONTACTO REALIZADO
 
-* CantidadIntentos
+* CantidadIntentos: (cantidad_intentos_list)
 	- 0
 	- 1
 	- 2
