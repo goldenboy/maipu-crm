@@ -22,7 +22,7 @@ class TipoSugar:
 
 class TipoSugar_id(TipoSugar):
     """Identificador unico en SugarCRM."""
-    def __init__(self):
+    def __init__(self, opciones = None):
         self.valor = ''
 
     def validar(self):
@@ -33,7 +33,7 @@ class TipoSugar_id(TipoSugar):
 class TipoSugar_datetime(TipoSugar):
     """Dato que almacena fecha y hora en SugarCRM.
     En SugarCRM el formato es YYYY-MM-DD HH:mm:SS"""
-    def __init__(self):
+    def __init__(self, opciones = None):
         self.valor = ''
 
     def validar(self):
@@ -43,7 +43,7 @@ class TipoSugar_datetime(TipoSugar):
 
 class TipoSugar_assigned_user_name(TipoSugar):
     """Dato que almacena un nombre de usuario en SugarCRM."""
-    def __init__(self):
+    def __init__(self, opciones = None):
         self.valor = ''
 
     def validar(self):
@@ -53,7 +53,7 @@ class TipoSugar_assigned_user_name(TipoSugar):
 
 class TipoSugar_text(TipoSugar):
     """Dato que almacena el contenido de un campo de texto en SugarCRM."""
-    def __init__(self):
+    def __init__(self, opciones = None):
         self.valor = ''
 
     def validar(self):
@@ -63,7 +63,7 @@ class TipoSugar_text(TipoSugar):
 
 class TipoSugar_bool(TipoSugar):
     """Dato que almacena un dato booleano en SugarCRM."""
-    def __init__(self):
+    def __init__(self, opciones = None):
         self.valor = True
 
     def validar(self):
@@ -73,7 +73,7 @@ class TipoSugar_bool(TipoSugar):
 
 class TipoSugar_relate(TipoSugar):
     """Dato que almacena una relacion entre campos en SugarCRM."""
-    def __init__(self):
+    def __init__(self, opciones = None):
         self.valor = ''
 
     def validar(self):
@@ -99,7 +99,7 @@ class TipoSugar_enum(TipoSugar):
 
 class TipoSugar_varchar(TipoSugar):
     """Dato que almacena un string en SugarCRM."""
-    def __init__(self):
+    def __init__(self, opciones = None):
         self.valor = ''
 
     def validar(self):
@@ -109,7 +109,7 @@ class TipoSugar_varchar(TipoSugar):
 
 class TipoSugar_phone(TipoSugar):
     """Dato que almacena un numero telefonico en SugarCRM."""
-    def __init__(self):
+    def __init__(self, opciones = None):
         self.valor = ''
     
     def validar(self):
@@ -120,7 +120,7 @@ class TipoSugar_phone(TipoSugar):
 class TipoSugar_date(TipoSugar):
     """Dato que almacena una fecha en SugarCRM.
     En SugarCRM el formato es YYYY-MM-DD"""
-    def __init__(self):
+    def __init__(self, opciones = None):
         self.valor = ''
     
     def validar(self):
@@ -130,7 +130,7 @@ class TipoSugar_date(TipoSugar):
 
 class TipoSugar_int(TipoSugar):
     """Dato que almacena un valor entero en SugarCRM."""
-    def __init__(self):
+    def __init__(self, opciones = None):
         self.valor = 0
         
     def validar(self):
@@ -142,7 +142,7 @@ class InstanciaSugar:
     """Una instancia de Sugar es una instalacion en particular, es decir
     los datos para accederla: URL, nombre de usuario, contrasena."""
     
-    def __init__(self, url, usuario, clave):
+    def __init__(self, url, usuario, clave, modulos):
         self.url = url
         self.usuario = usuario
         self.clave = clave
@@ -159,15 +159,29 @@ class InstanciaSugar:
         
         self.sesion = resultado['id']
         
-        # Obtengo la lista de modulos accesibles:
-        resultado = self.wsdl.get_available_modules(self.sesion)
-        if int(resultado['error']['number']) != 0:
-            raise ErrorSugar('Error al obtener la lista de modulos')
-        
-        # Creo un diccionario dentro de la instancia con todos los modulos disp.
         self.modulos = {}
-        for modulo in resultado['modules']:
+        for modulo in modulos:
             self.modulos[modulo] = ModuloSugar(self, modulo)
+
+#    def obtener_modulos(self):
+#        """Sirve para obtener la lista completa de modulos de la Instanica."""
+#        # Obtengo la lista de modulos accesibles:
+#        resultado = self.wsdl.get_available_modules(self.sesion)
+#        if int(resultado['error']['number']) != 0:
+#            raise ErrorSugar('Error al obtener la lista de modulos')
+#        
+#        # Creo un diccionario dentro de la instancia con todos los modulos disp.
+#        self.modulos = {}
+#        print "#################"
+#        print resultado['modules']
+#        print "#################"
+#        for modulo in resultado['modules']:
+#            if modulo not in ['Home', 'Dashboard', 'Calendar', 'Activities', 'Emails', 'Documents', 'Currencies']:
+#                self.modulos[modulo] = ModuloSugar(self, modulo)
+#            else:
+#                pass
+#        print "##################################### Obtuve todos los modulos ###############################"
+#        return 0
 
 
 class ModuloSugar:
@@ -186,7 +200,9 @@ class ModuloSugar:
         # tipos.
         resultado = self.instancia.wsdl.get_module_fields(self.instancia.sesion,
                                                          self.nombre_modulo)
-        if int(resultado['error']['number']) != 0:
+        print nombre_modulo
+        print resultado
+        if resultado['error'] != '' and resultado['error']['number'] != None:
             raise ErrorSugar('Error al obtener la lista de campos del modulo')
         
         self.campos = []            # Todos los campos del modulo.
@@ -213,6 +229,8 @@ class ModuloSugar:
                     opciones[opcion['name']] = opcion['value']
                 # Paso este diccionario al diccionario de parametros del tipo.
                 self.campos_parametros[campo['name']] = opciones
+            else:
+                self.campos_parametros[campo['name']] = None
 
 
 class ObjetoSugar:
@@ -223,16 +241,29 @@ class ObjetoSugar:
 
         # Dejo una referencia al modulo al que pertenece el objeto.
         self.modulo = modulo
+        
+        # El objeto tiene un campo con el mapeo 'nombre_campo' => valor para 
+        # cada uno de los campos del objeto (valor es algo de tipo TipoSugar).
+        self.campos = {}
+        for campo in self.modulo.campos:
+            # Para cada campo posible en el modulo, hago:
+            opciones = self.modulo.campos_parametros[campo]
+            self.campos[campo] = eval(self.modulo.campos_tipo[campo])(opciones)
     
     def validar(self):
         """Verifica que los campos presentes en el objeto sean los apropiados
         para el modulo al que el objeto pertenece. A su vez verifica que los
         tipos de los atributos sean los apropiados."""
+        
+        for campo in self.campos.keys():
+            eval(self.campos[campo]).validar()
+        
+        return True
     
     def grabar(self):
         """Guarda el objeto en el SugarCRM, a traves de SOAP. Si el campo id
         no esta definido, se creara un objeto nuevo."""
-
+        pass
 
 
 
