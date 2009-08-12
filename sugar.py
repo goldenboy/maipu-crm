@@ -1,4 +1,6 @@
 
+# Descripcion: libreria de sugar
+
 import SOAPpy
 import hashlib
 import types
