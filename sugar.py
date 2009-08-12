@@ -1,7 +1,6 @@
 
 import SOAPpy
 import hashlib
-import crm_config
 import types
 
 class ErrorSugar(Exception):
@@ -281,9 +280,9 @@ class ObjetoSugar:
             nvl.append(nv)
         
         # utilizo set_entry para actualizar el registro en SugarCRM.
-        resultado = self.modulo.instancia.wsdl.set_entry(self.modulo.instancia.sesion,
-                                                            self.modulo.nombre_modulo,
-                                                            nvl)
+        resultado = self.modulo.instancia.wsdl.set_entry(
+                                                self.modulo.instancia.sesion,
+                                                self.modulo.nombre_modulo, nvl)
 
 
 
