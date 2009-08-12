@@ -180,8 +180,7 @@ class ModuloSugar:
         # tipos.
         resultado = self.instancia.wsdl.get_module_fields(self.instancia.sesion,
                                                          self.nombre_modulo)
-        print nombre_modulo
-        print resultado
+
         if resultado['error'] != '' and resultado['error']['number'] != None:
             raise ErrorSugar('Error al obtener la lista de campos del modulo')
         
@@ -279,15 +278,12 @@ class ObjetoSugar:
             nv = {}
             nv['name'] = campo
             nv['value'] = self.obtener_campo(campo)
-#            print nv
             nvl.append(nv)
         
         # utilizo set_entry para actualizar el registro en SugarCRM.
         resultado = self.modulo.instancia.wsdl.set_entry(self.modulo.instancia.sesion,
                                                             self.modulo.nombre_modulo,
                                                             nvl)
-        print 'resultado: '
-        print resultado
 
 
 
