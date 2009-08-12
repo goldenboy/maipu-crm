@@ -163,26 +163,6 @@ class InstanciaSugar:
         for modulo in modulos:
             self.modulos[modulo] = ModuloSugar(self, modulo)
 
-#    def obtener_modulos(self):
-#        """Sirve para obtener la lista completa de modulos de la Instanica."""
-#        # Obtengo la lista de modulos accesibles:
-#        resultado = self.wsdl.get_available_modules(self.sesion)
-#        if int(resultado['error']['number']) != 0:
-#            raise ErrorSugar('Error al obtener la lista de modulos')
-#        
-#        # Creo un diccionario dentro de la instancia con todos los modulos disp.
-#        self.modulos = {}
-#        print "#################"
-#        print resultado['modules']
-#        print "#################"
-#        for modulo in resultado['modules']:
-#            if modulo not in ['Home', 'Dashboard', 'Calendar', 'Activities', 'Emails', 'Documents', 'Currencies']:
-#                self.modulos[modulo] = ModuloSugar(self, modulo)
-#            else:
-#                pass
-#        print "##################################### Obtuve todos los modulos ###############################"
-#        return 0
-
 
 class ModuloSugar:
     """Clase que define un modulo accesible sobre Sugar."""
@@ -233,6 +213,27 @@ class ModuloSugar:
                 self.campos_parametros[campo['name']] = None
 
 
+#    def buscar(self, nombre_campo, valor, campos_devueltos):
+    def buscar(self, nombre_campo, valor):
+        """Devuelve la lista de objetos que cumplen con el criterio
+        especificado."""
+        resultado = self.instancia.wsdl.get_entry_list(self.instancia.sesion,
+                                        self.nombre_modulo,
+                                        self.nombre_modulo.lower() +'.'+ nombre_campo + 
+                                        ' LIKE "' + valor + '"', ''
+#                                        , 0, campos_devueltos)
+                                        , 0)
+#        print resultado['result_count'] + ' resultados'
+        
+        lista = []
+        for i in range(resultado['result_count']):
+            nuevo = ObjetoSugar(self)
+            for atributo in resultado['entry_list'][i]['name_value_list']:
+                nuevo.modificar_campo(atributo['name'], atributo['value'])
+            lista.append(nuevo)
+        return lista
+
+
 class ObjetoSugar:
     """Clase que define los elementos de cualquiera de los modulos de Sugar."""
     
@@ -250,20 +251,43 @@ class ObjetoSugar:
             opciones = self.modulo.campos_parametros[campo]
             self.campos[campo] = eval(self.modulo.campos_tipo[campo])(opciones)
     
+
     def validar(self):
         """Verifica que los campos presentes en el objeto sean los apropiados
         para el modulo al que el objeto pertenece. A su vez verifica que los
         tipos de los atributos sean los apropiados."""
         
         for campo in self.campos.keys():
-            eval(self.campos[campo]).validar()
+            self.campos[campo].validar()
         
-        return True
+    def obtener_campo(self, nombre_campo):
+        """Devuelve el valor del campo pasado como parametro."""
+        return self.campos[nombre_campo]
     
+    def modificar_campo(self, nombre_campo, nuevo_valor):
+        """Escribe el nuevo valor del campo pasado como parametro."""
+        self.campos[nombre_campo] = nuevo_valor
+
     def grabar(self):
         """Guarda el objeto en el SugarCRM, a traves de SOAP. Si el campo id
         no esta definido, se creara un objeto nuevo."""
-        pass
+        
+        # nvl es la name_value_list, que tiene la lista de atributos.
+        nvl = []
+        for campo in self.campos.keys():
+            # defino un name_value individual.
+            nv = {}
+            nv['name'] = campo
+            nv['value'] = self.obtener_campo(campo)
+#            print nv
+            nvl.append(nv)
+        
+        # utilizo set_entry para actualizar el registro en SugarCRM.
+        resultado = self.modulo.instancia.wsdl.set_entry(self.modulo.instancia.sesion,
+                                                            self.modulo.nombre_modulo,
+                                                            nvl)
+        print 'resultado: '
+        print resultado
 
 
 
