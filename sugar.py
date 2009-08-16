@@ -262,11 +262,11 @@ class ObjetoSugar:
         
     def obtener_campo(self, nombre_campo):
         """Devuelve el valor del campo pasado como parametro."""
-        return self.campos[nombre_campo]
+        return self.campos[nombre_campo].valor
     
     def modificar_campo(self, nombre_campo, nuevo_valor):
         """Escribe el nuevo valor del campo pasado como parametro."""
-        self.campos[nombre_campo] = nuevo_valor
+        self.campos[nombre_campo].valor = nuevo_valor
 
     def grabar(self):
         """Guarda el objeto en el SugarCRM, a traves de SOAP. Si el campo id
