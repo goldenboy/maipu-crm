@@ -16,6 +16,9 @@ class TipoSugar:
     elementos en SugarCRM."""
     def __init__(self):
         pass
+    
+    def validar(self):
+        return True
 
 # La API de SOAP tiene varios tipos: id, datetime, assigned_user_name, text,
 #  bool, relate, enum (complicado -> options[name, value]), varchar, phone,
@@ -213,23 +216,32 @@ class ModuloSugar:
                 self.campos_parametros[campo['name']] = None
 
 
-#    def buscar(self, nombre_campo, valor, campos_devueltos):
-    def buscar(self, nombre_campo, valor):
+    def buscar(self, campos=None, **consulta):
         """Devuelve la lista de objetos que cumplen con el criterio
         especificado."""
+        
+        # Debo construir es string de la consulta a partir de los valores
+        #  obtenidos mediante el parametro 'consulta'.
+        str_cons = ''
+        for clave in consulta.keys():
+            # Si ya habia agregado alguna condicion antes, pongo un AND al medio
+            if str_cons != '':
+                str_cons += ' AND '
+            
+            str_cons += self.nombre_modulo.lower() + '.' + clave + ' = "' + \
+                                consulta[clave] + '"'
+        #print str_cons        
         resultado = self.instancia.wsdl.get_entry_list(self.instancia.sesion,
-                                        self.nombre_modulo,
-                                        self.nombre_modulo.lower() +'.'+ nombre_campo + 
-                                        ' LIKE "' + valor + '"', ''
-#                                        , 0, campos_devueltos)
-                                        , 0)
-#        print resultado['result_count'] + ' resultados'
+                                        self.nombre_modulo, str_cons, '', 0)
         
         lista = []
         for i in range(resultado['result_count']):
-            nuevo = ObjetoSugar(self)
+            # Defino el diccionario con los valores de inicializacion del objeto
+            valores_iniciales = {}
             for atributo in resultado['entry_list'][i]['name_value_list']:
-                nuevo.modificar_campo(atributo['name'], atributo['value'])
+                valores_iniciales[atributo['name']] = atributo['value']
+            
+            nuevo = ObjetoSugar(self, valores_iniciales)
             lista.append(nuevo)
         return lista
 
@@ -237,7 +249,7 @@ class ModuloSugar:
 class ObjetoSugar:
     """Clase que define los elementos de cualquiera de los modulos de Sugar."""
     
-    def __init__(self, modulo):
+    def __init__(self, modulo, valores_iniciales = {}):
         """Creo una instancia de un objeto nuevo o existente."""
 
         # Dejo una referencia al modulo al que pertenece el objeto.
@@ -246,10 +258,14 @@ class ObjetoSugar:
         # El objeto tiene un campo con el mapeo 'nombre_campo' => valor para 
         # cada uno de los campos del objeto (valor es algo de tipo TipoSugar).
         self.campos = {}
+        self.campos_sucios = []
         for campo in self.modulo.campos:
             # Para cada campo posible en el modulo, hago:
             opciones = self.modulo.campos_parametros[campo]
             self.campos[campo] = eval(self.modulo.campos_tipo[campo])(opciones)
+        
+        for atributo in valores_iniciales.keys():
+            self.modificar_campo(atributo, valores_iniciales[atributo])
     
 
     def validar(self):
@@ -267,6 +283,8 @@ class ObjetoSugar:
     def modificar_campo(self, nombre_campo, nuevo_valor):
         """Escribe el nuevo valor del campo pasado como parametro."""
         self.campos[nombre_campo].valor = nuevo_valor
+        self.campos_sucios.append(nombre_campo)
+        self.campos[nombre_campo].validar()
 
     def grabar(self):
         """Guarda el objeto en el SugarCRM, a traves de SOAP. Si el campo id
@@ -274,7 +292,8 @@ class ObjetoSugar:
         
         # nvl es la name_value_list, que tiene la lista de atributos.
         nvl = []
-        for campo in self.campos.keys():
+#        for campo in self.campos.keys():
+        for campo in self.campos_sucios:
             # defino un name_value individual.
             nv = {}
             nv['name'] = campo
@@ -285,6 +304,7 @@ class ObjetoSugar:
         resultado = self.modulo.instancia.wsdl.set_entry(
                                                 self.modulo.instancia.sesion,
                                                 self.modulo.nombre_modulo, nvl)
-
+        
+        return resultado['error']
 
 

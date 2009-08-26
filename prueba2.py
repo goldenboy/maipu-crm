@@ -10,13 +10,14 @@ instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
 
 # Obtengo los contactos que tengan como primer nombre "Hai". Supongo que existen
 # registros.
-res = instancia.modulos['Contacts'].buscar('first_name', 'Edna')
+res = instancia.modulos['Contacts'].buscar(first_name='Edna')
 
 # Tomo el primero de los resultados.
 objeto = res[0]
 
 # Cambio el pais por "Argentina"
-objeto.modificar_campo('primary_address_country', 'Argentina')
+objeto.modificar_campo('primary_address_country', 'USA')
+print objeto.obtener_campo('primary_address_country')
 
 # Actualizo el registro en SugarCRM.
 objeto.grabar()
