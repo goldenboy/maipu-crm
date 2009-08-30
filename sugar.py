@@ -4,6 +4,7 @@
 import SOAPpy
 import hashlib
 import types
+import time
 
 class ErrorSugar(Exception):
     def __init__(self, value):
@@ -14,11 +15,16 @@ class ErrorSugar(Exception):
 class TipoSugar:
     """Tipo de datos abstracto que representa los diferentes atributos de los
     elementos en SugarCRM."""
-    def __init__(self):
-        pass
     
-    def validar(self):
-        return True
+    def asignar(self, valor):
+        self.validar(valor)
+        self.valor = valor
+    
+    def a_sugar(self):
+        return self.valor
+    
+    def de_string(self, valor):
+        return valor
 
 # La API de SOAP tiene varios tipos: id, datetime, assigned_user_name, text,
 #  bool, relate, enum (complicado -> options[name, value]), varchar, phone,
@@ -26,121 +32,206 @@ class TipoSugar:
 
 class TipoSugar_id(TipoSugar):
     """Identificador unico en SugarCRM."""
-    def __init__(self, opciones = None):
-        self.valor = ''
+    def __init__(self, valor_inicial = None, opciones = None):
+        self.valor = valor_inicial
 
-    def validar(self):
-        if type(self.valor) != types.StringType:
+    def validar(self, valor):
+        if type(valor) != types.StringType:
             raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
         return True
+
 
 class TipoSugar_datetime(TipoSugar):
     """Dato que almacena fecha y hora en SugarCRM.
     En SugarCRM el formato es YYYY-MM-DD HH:mm:SS"""
-    def __init__(self, opciones = None):
-        self.valor = ''
-
-    def validar(self):
-        if type(self.valor) != types.StringType:
-            raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
+    def __init__(self, valor_inicial = None, opciones = None):
+        try:
+            self.valor = time.strptime(valor_inicial, '%Y-%m-%d %H:%M:%S')
+        except Exception:
+            self.valor = None
+            
+    def validar(self, valor):
+        if type(valor) != type(time.strptime('2009', '%Y')):
+            raise ErrorSugar("Tipo incorrecto. Esperaba un struct_time.")
         return True
+    
+    def a_sugar(self):
+        try:
+            valor = "%04i-%02i-%02i %02i:%02i:%02i" % (self.valor.tm_year,
+                    self.valor.tm_mon, self.valor.tm_mday, self.valor.tm_hour,
+                    self.valor.tm_min, self.valor.tm_sec)
+            return valor
+        except AttributeError:
+            return ''
+
+    def de_string(self, valor):
+        return time.strptime(valor, '%Y-%m-%d %H:%M:%S')
+
 
 class TipoSugar_assigned_user_name(TipoSugar):
     """Dato que almacena un nombre de usuario en SugarCRM."""
-    def __init__(self, opciones = None):
-        self.valor = ''
+    def __init__(self, valor_inicial = None, opciones = None):
+        self.valor = valor_inicial
 
-    def validar(self):
-        if type(self.valor) != types.StringType:
+    def validar(self, valor):
+        if type(valor) != types.StringType:
             raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
         return True
+
 
 class TipoSugar_text(TipoSugar):
     """Dato que almacena el contenido de un campo de texto en SugarCRM."""
-    def __init__(self, opciones = None):
-        self.valor = ''
+    def __init__(self, valor_inicial = None, opciones = None):
+        self.valor = valor_inicial
 
-    def validar(self):
-        if type(self.valor) != types.StringType:
+    def validar(self, valor):
+        if type(valor) != types.StringType:
             raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
         return True
+
 
 class TipoSugar_bool(TipoSugar):
     """Dato que almacena un dato booleano en SugarCRM."""
-    def __init__(self, opciones = None):
-        self.valor = True
+    def __init__(self, valor_inicial = '0', opciones = None):
+        if valor_inicial == '0':
+            self.valor = False
+        else:
+            self.valor = True
 
-    def validar(self):
-        if type(self.valor) != types.BooleanType:
+    def validar(self, valor):
+        if type(valor) != types.BooleanType:
             raise ErrorSugar("Tipo incorrecto. Esperaba un booleano.")
         return True
+    
+    def a_sugar(self):
+        if self.valor == True:
+            return '1'
+        else:
+            return '0'
+
+    def de_string(self, valor):
+        if valor == '0':
+            return False
+        else:
+            return True
+
 
 class TipoSugar_relate(TipoSugar):
     """Dato que almacena una relacion entre campos en SugarCRM."""
-    def __init__(self, opciones = None):
-        self.valor = ''
+    def __init__(self, valor_inicial = None, opciones = None):
+        self.valor = valor_inicial
 
-    def validar(self):
-        if type(self.valor) != types.StringType:
+    def validar(self, valor):
+        if type(valor) != types.StringType:
             raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
         return True
+
 
 class TipoSugar_enum(TipoSugar):
     """Dato que almacena un dato que puede tomar multiples valores en
     SugarCRM."""
-    def __init__(self, opciones):
+    def __init__(self, valor_inicial = None, opciones = None):
         # Inicializo el valor como el primer dato disponible en las opciones de
-        #  inicializacion.
-        self.valor = opciones.keys()[0]
+        #  inicializacion, si no hay un valor inicial disponible.
+        if valor_inicial == None or valor_inicial not in opciones.keys():
+            self.valor = opciones.keys()[0]
+        else:
+            self.valor = valor_inicial
+        
         self.opciones = opciones
-##################### Que pasa si no hay opciones???
+##################### Que pasa si no hay opciones??? No deberia dejarlo Sugar
 
-    def validar(self):
-        if self.valor in self.opciones.keys():
+    def validar(self, valor):
+        if valor in self.opciones.keys():
             return True
         else:
             raise ErrorSugar("Valor de la opcion incorrecto.")
 
+    def de_string(self, valor):
+        if valor in self.opciones:
+            return valor
+        else:
+            raise ValueError
+
+
 class TipoSugar_varchar(TipoSugar):
     """Dato que almacena un string en SugarCRM."""
-    def __init__(self, opciones = None):
-        self.valor = ''
+    def __init__(self, valor_inicial = None, opciones = None):
+        self.valor = valor_inicial
 
-    def validar(self):
-        if type(self.valor) != types.StringType:
+    def validar(self, valor):
+        if type(valor) != types.StringType:
             raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
         return True
+
 
 class TipoSugar_phone(TipoSugar):
     """Dato que almacena un numero telefonico en SugarCRM."""
-    def __init__(self, opciones = None):
-        self.valor = ''
+    def __init__(self, valor_inicial = None, opciones = None):
+        self.valor = valor_inicial
     
-    def validar(self):
-        if type(self.valor) != types.StringType:
+    def validar(self, valor):
+        if type(valor) != types.StringType:
             raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
         return True
+
 
 class TipoSugar_date(TipoSugar):
     """Dato que almacena una fecha en SugarCRM.
     En SugarCRM el formato es YYYY-MM-DD"""
-    def __init__(self, opciones = None):
-        self.valor = ''
+    def __init__(self, valor_inicial = None, opciones = None):
+        try:
+            self.valor = time.strptime(valor_inicial, '%Y-%m-%d')
+        except Exception:
+            self.valor = None
     
-    def validar(self):
-        if type(self.valor) != types.StringType:
-            raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
+    def validar(self, valor):
+        if type(valor) != type(time.strptime('2009', '%Y')):
+            raise ErrorSugar("Tipo incorrecto. Esperaba un struct_time.")
         return True
+    
+    def a_sugar(self):
+        try:
+            valor = "%04i-%02i-%02i" % (self.valor.tm_year, self.valor.tm_mon,
+                                    self.valor.tm_mday)
+            return valor
+        except AttributeError:
+            return ''
+
+    def de_string(self, valor):
+        try:
+            valor_nuevo = time.strptime(valor, '%Y-%m-%d')
+            return valor_nuevo
+        except ValueError:
+            return None
+
 
 class TipoSugar_int(TipoSugar):
     """Dato que almacena un valor entero en SugarCRM."""
-    def __init__(self, opciones = None):
-        self.valor = 0
+    def __init__(self, valor_inicial = None, opciones = None):
+        if valor_inicial not in [None, '']:
+            self.valor = int(valor_inicial)
+        else:
+            self.valor = None
         
-    def validar(self):
-        if type(self.valor) != types.IntType:
+    def validar(self, valor):
+        if type(valor) != types.IntType:
             raise ErrorSugar("Tipo incorrecto. Esperaba un entero.")
         return True
+    
+    def a_sugar(self):
+        if self.valor != None:
+            return str(self.valor)
+        else:
+            return ''
+
+    def de_string(self, valor):
+        try:
+            valor_nuevo = int(valor)
+            return valor_nuevo
+        except ValueError:
+            return None
+
 
 class InstanciaSugar:
     """Una instancia de Sugar es una instalacion en particular, es decir
@@ -262,10 +353,8 @@ class ObjetoSugar:
         for campo in self.modulo.campos:
             # Para cada campo posible en el modulo, hago:
             opciones = self.modulo.campos_parametros[campo]
-            self.campos[campo] = eval(self.modulo.campos_tipo[campo])(opciones)
-        
-        for atributo in valores_iniciales.keys():
-            self.modificar_campo(atributo, valores_iniciales[atributo])
+            self.campos[campo] = eval(self.modulo.campos_tipo[campo])\
+                                    (valores_iniciales.get(campo), opciones)
     
 
     def validar(self):
@@ -278,13 +367,21 @@ class ObjetoSugar:
         
     def obtener_campo(self, nombre_campo):
         """Devuelve el valor del campo pasado como parametro."""
-        return self.campos[nombre_campo].valor
+        
+#        return self.campos[nombre_campo].valor
+        return self.campos[nombre_campo]
     
     def modificar_campo(self, nombre_campo, nuevo_valor):
         """Escribe el nuevo valor del campo pasado como parametro."""
-        self.campos[nombre_campo].valor = nuevo_valor
+        
+        self.campos[nombre_campo].asignar(nuevo_valor)
         self.campos_sucios.append(nombre_campo)
-        self.campos[nombre_campo].validar()
+
+    def importar_campo(self, nombre_campo, nuevo_valor):
+        """Escribe el nuevo valor del campo con el string del parametro."""
+        
+        self.campos[nombre_campo].de_string(nuevo_valor)
+        self.campos_sucios.append(nombre_campo)
 
     def grabar(self):
         """Guarda el objeto en el SugarCRM, a traves de SOAP. Si el campo id
@@ -292,12 +389,11 @@ class ObjetoSugar:
         
         # nvl es la name_value_list, que tiene la lista de atributos.
         nvl = []
-#        for campo in self.campos.keys():
         for campo in self.campos_sucios:
             # defino un name_value individual.
             nv = {}
             nv['name'] = campo
-            nv['value'] = self.obtener_campo(campo)
+            nv['value'] = self.obtener_campo(campo).a_sugar()
             nvl.append(nv)
         
         # utilizo set_entry para actualizar el registro en SugarCRM.

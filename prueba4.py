@@ -21,7 +21,7 @@ lineas = sys.stdin.readlines()
 
 for linea in lineas:
     (nombre_campo, s, valor_campo) = linea.partition(':')
-    objeto.modificar_campo(nombre_campo, valor_campo.rstrip())
+    objeto.importar_campo(nombre_campo, valor_campo.rstrip())
 
 objeto.grabar()
 
