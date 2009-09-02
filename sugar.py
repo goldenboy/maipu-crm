@@ -382,8 +382,8 @@ class ObjetoSugar:
     def importar_campo(self, nombre_campo, nuevo_valor):
         """Escribe el nuevo valor del campo con el string del parametro."""
         
-        self.campos[nombre_campo].de_string(nuevo_valor)
-        self.campos_sucios.append(nombre_campo)
+        valor = self.campos[nombre_campo].de_string(nuevo_valor)
+        self.modificar_campo(nombre_campo, valor)
 
 
     def grabar(self):
@@ -392,7 +392,7 @@ class ObjetoSugar:
         
         # nvl es la name_value_list, que tiene la lista de atributos.
         nvl = []
-        for campo in self.campos_sucios:
+        for campo in set(self.campos_sucios):
             # defino un name_value individual.
             nv = {}
             nv['name'] = campo
@@ -409,7 +409,8 @@ class ObjetoSugar:
 
     def relacionar(self, obj_principal, nombre_campo):
         """Relaciona este objeto con el objeto obj_principal, siendo este
-        objeto el related."""
+        objeto el related. Usa nombre_campo como el campo de referencia para
+        conectarlos."""
         
         # nvl es la name_value_list que guarda el par de identificadores que se
         # insertaran en la relacion

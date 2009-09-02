@@ -17,7 +17,7 @@ campos = arch_plantilla.readlines()
 datos = arch_datos.readlines()
 
 for campo in zip(campos, datos):
-    objeto.modificar_campo(campo[0].rstrip(), campo[1].rstrip())
+    objeto.importar_campo(campo[0].rstrip(), campo[1].rstrip())
 
 print objeto.grabar()
 
