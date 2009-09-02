@@ -365,23 +365,26 @@ class ObjetoSugar:
         for campo in self.campos.keys():
             self.campos[campo].validar()
         
+
     def obtener_campo(self, nombre_campo):
         """Devuelve el valor del campo pasado como parametro."""
         
-#        return self.campos[nombre_campo].valor
         return self.campos[nombre_campo]
     
+
     def modificar_campo(self, nombre_campo, nuevo_valor):
         """Escribe el nuevo valor del campo pasado como parametro."""
         
         self.campos[nombre_campo].asignar(nuevo_valor)
         self.campos_sucios.append(nombre_campo)
 
+
     def importar_campo(self, nombre_campo, nuevo_valor):
         """Escribe el nuevo valor del campo con el string del parametro."""
         
         self.campos[nombre_campo].de_string(nuevo_valor)
         self.campos_sucios.append(nombre_campo)
+
 
     def grabar(self):
         """Guarda el objeto en el SugarCRM, a traves de SOAP. Si el campo id
@@ -402,5 +405,20 @@ class ObjetoSugar:
                                                 self.modulo.nombre_modulo, nvl)
         
         return resultado['error']
+
+
+    def relacionar(self, obj_principal, nombre_campo):
+        """Relaciona este objeto con el objeto obj_principal, siendo este
+        objeto el related."""
+        
+        # nvl es la name_value_list que guarda el par de identificadores que se
+        # insertaran en la relacion
+        id = self.obtener_campo('id').a_sugar()
+        relacionar_con = obj_principal.obtener_campo('id').a_sugar()
+        nvl = []
+        nvl.append({'name': 'id', 'value': id})
+        nvl.append({'name': nombre_campo, 'value': relacionar_con})
+        resultado = self.modulo.instancia.wsdl.set_entry(
+                self.modulo.instancia.sesion, self.modulo.nombre_modulo, nvl)
 
 
