@@ -21,13 +21,13 @@ class TipoSugar:
         self.valor = valor
     
     def a_sugar(self):
-        return self.valor
-    
-    def de_string(self, valor):
         if self.valor != None:
-            return valor
+            return self.valor
         else:
             return ''
+    
+    def de_string(self, valor):
+        return valor
 
 # La API de SOAP tiene varios tipos: id, datetime, assigned_user_name, text,
 #  bool, relate, enum (complicado -> options[name, value]), varchar, phone,
@@ -310,7 +310,7 @@ class ModuloSugar:
                 self.campos_parametros[campo['name']] = None
 
 
-    def buscar(self, campos=None, **consulta):
+    def buscar(self, **consulta):
         """Devuelve la lista de objetos que cumplen con el criterio
         especificado."""
         
@@ -322,9 +322,13 @@ class ModuloSugar:
             if str_cons != '':
                 str_cons += ' AND '
             
-            str_cons += self.nombre_modulo.lower() + '.' + clave + ' = "' + \
-                                consulta[clave] + '"'
-        #print str_cons        
+            if_cstm = ''
+            if clave.endswith('_c'):
+                if_cstm = '_cstm'
+            
+            str_cons += self.nombre_modulo.lower() + if_cstm + '.' + clave + \
+                                ' = "' + consulta[clave] + '"'
+#        print str_cons        
         resultado = self.instancia.wsdl.get_entry_list(self.instancia.sesion,
                                         self.nombre_modulo, str_cons, '', 0)
         
