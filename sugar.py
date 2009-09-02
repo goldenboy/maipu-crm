@@ -24,7 +24,10 @@ class TipoSugar:
         return self.valor
     
     def de_string(self, valor):
-        return valor
+        if self.valor != None:
+            return valor
+        else:
+            return ''
 
 # La API de SOAP tiene varios tipos: id, datetime, assigned_user_name, text,
 #  bool, relate, enum (complicado -> options[name, value]), varchar, phone,
