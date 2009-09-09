@@ -142,7 +142,6 @@ class TipoSugar_enum(TipoSugar):
             self.valor = valor_inicial
         
         self.opciones = opciones
-##################### Que pasa si no hay opciones??? No deberia dejarlo Sugar
 
     def validar(self, valor):
         if valor in self.opciones.keys():

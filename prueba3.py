@@ -12,7 +12,7 @@ import crm_config
 instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
                                     crm_config.CLAVE, ['Contacts'])
 
-# Obtengo los contactos que tengan como parte del primer nombre "Edna". Supongo
+# Obtengo los contactos que tengan como parte del primer nombre "Juan". Supongo
 #  que existen registros.
 res = instancia.modulos['Contacts'].buscar(first_name='Juan')
 

@@ -8,7 +8,7 @@ instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
                     crm_config.CLAVE, ['mm002_Ventas', 'mm002_Marcas',
                                         'mm002_Modelos', 'mm002_Tipo_venta',
                                         'mm002_Empleados', 'mm002_Sucursales',
-                                        'Contacts'])
+                                        'Contacts', 'mm002_enc_sat_venta'])
 
 # Creo un objeto nuevo del modulo Ventas.
 objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Ventas'])
@@ -34,6 +34,9 @@ valor = objeto.obtener_campo('id_maipu_cliente').a_sugar()
 res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
 if len(res) != 1:
     raise sugar.ErrorSugar('No existe un solo cliente con ese ID')
+# Guardo el ID de sugar para mas tarde
+contacto = res[0]
+contact_id = contacto.obtener_campo('id').a_sugar()
 
 
 # Luego veo que la marca este cargada, y si no lo esta, la agrego.
@@ -129,13 +132,28 @@ elif len(res) == 0:
     print "Grabando una nueva sucursal..."
     obj_nuevo.grabar()
 
-
-
 # Aqui ya estan creadas todas las entradas en Sugar de las cuales esta venta
 # depende. Ya puedo agrear la venta a la base de datos.
 
 print "Grabando una nueva VENTA..."
 print objeto.grabar()
+
+
+# Agrego una encuesta de satisfaccion
+
+encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_enc_sat_venta'])
+#objeto.importar_campo('contact_id_c', contact_id)
+# Calculo el id de la operacion
+operacion_id = objeto.obtener_campo('operacion_id').a_sugar()
+encuesta.importar_campo('operacion_id', operacion_id)
+encuesta.grabar()
+
+# si se grabo correctamente la encuesta, la deberia poder recuperar.
+res = instancia.modulos['mm002_enc_sat_venta'].buscar(operacion_id=operacion_id)
+encuesta = res[0]
+
+# Relaciono la encuesta creada con el cliente
+encuesta.relacionar(contacto, 'contact_id_c')
 
 
 
