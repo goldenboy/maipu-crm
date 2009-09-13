@@ -245,8 +245,8 @@ class InstanciaSugar:
         self.clave = clave
         
         self.wsdl = SOAPpy.WSDL.Proxy(url)
-        #self.wsdl.soapproxy.config.dumpSOAPOut = 1
-        #self.wsdl.soapproxy.config.dumpSOAPIn = 1
+#        self.wsdl.soapproxy.config.dumpSOAPOut = 1
+#        self.wsdl.soapproxy.config.dumpSOAPIn = 1
         
         resultado = self.wsdl.login({'user_name': usuario,
                             'password': hashlib.md5(clave).hexdigest(),
@@ -383,7 +383,7 @@ class ObjetoSugar:
         
         self.campos[nombre_campo].asignar(nuevo_valor)
         self.campos_sucios.append(nombre_campo)
-
+        
 
     def importar_campo(self, nombre_campo, nuevo_valor):
         """Escribe el nuevo valor del campo con el string del parametro."""
@@ -395,6 +395,11 @@ class ObjetoSugar:
     def grabar(self):
         """Guarda el objeto en el SugarCRM, a traves de SOAP. Si el campo id
         no esta definido, se creara un objeto nuevo."""
+        
+        # Si 'id' no estaba en blanco, lo agrego a los campos sucios, para que
+        # sugar actualice el objeto, en vez de crear uno nuevo.
+        if self.obtener_campo('id').a_sugar() != '':
+            self.campos_sucios.append('id')
         
         # nvl es la name_value_list, que tiene la lista de atributos.
         nvl = []
