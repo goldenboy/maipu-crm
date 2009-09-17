@@ -235,6 +235,10 @@ class TipoSugar_int(TipoSugar):
             return None
 
 
+TipoSugar_name = TipoSugar_varchar
+TipoSugar_parent_type = TipoSugar_varchar
+
+
 class InstanciaSugar:
     """Una instancia de Sugar es una instalacion en particular, es decir
     los datos para accederla: URL, nombre de usuario, contrasena."""
