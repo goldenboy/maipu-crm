@@ -88,7 +88,7 @@ class TipoSugar_text(TipoSugar):
         self.valor = valor_inicial
 
     def validar(self, valor):
-        if type(valor) != types.StringType:
+        if type(valor) != types.UnicodeType:
             raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
         return True
 
@@ -162,7 +162,7 @@ class TipoSugar_varchar(TipoSugar):
         self.valor = valor_inicial
 
     def validar(self, valor):
-        if type(valor) != types.StringType:
+        if type(valor) != types.UnicodeType:
             raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
         return True
 
