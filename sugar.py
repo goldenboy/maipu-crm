@@ -418,6 +418,10 @@ class ObjetoSugar:
         resultado = self.modulo.instancia.wsdl.set_entry(
                                                 self.modulo.instancia.sesion,
                                                 self.modulo.nombre_modulo, nvl)
+        self.modificar_campo('id', resultado['id'])
+        if resultado['error']['number'] == '0':
+            self.campos_sucios = []
+
         
         return resultado['error']
 
