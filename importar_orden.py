@@ -50,6 +50,8 @@ valor = objeto.obtener_campo('asesor_codigo').a_sugar()
 res = instancia.modulos['mm002_Empleados'].buscar(empleados_legajo=valor)
 if len(res) > 1:
     raise sugar.ErrorSugar('Hay empleados con legajo duplicado')
+elif len(res) == 1:
+    empleado = res[0]
 elif len(res) == 0:
     # Debo crear un objeto empleado nuevo y agregarlo.
     obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Empleados'])
@@ -58,6 +60,7 @@ elif len(res) == 0:
                         objeto.obtener_campo('asesor_nombre').a_sugar())
     print "Grabando un nuevo Empleado..."
     obj_nuevo.grabar()
+    empleado = obj_nuevo
 
 
 
@@ -93,4 +96,7 @@ encuesta.grabar()
 encuesta.relacionar(objeto, 'mm002_enc_servicios_mm002_ordenes_name')
 
 
+# Relaciono finalmente la encuesta con el asesor, de forma que aparezca su
+# nombre en el cuestionario
+encuesta.relacionar(empleado, 'mm002_empleados_mm002_enc_servicios')
 
