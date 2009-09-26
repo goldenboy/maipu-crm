@@ -149,8 +149,9 @@ encuesta.importar_campo('operacion_id', operacion_id)
 encuesta.grabar()
 
 # si se grabo correctamente la encuesta, la deberia poder recuperar.
-res = instancia.modulos['mm002_enc_sat_venta'].buscar(operacion_id=operacion_id)
-encuesta = res[0]
+# Ya no hace falta esto. La libreria recupera el ID automaticamente.
+#res = instancia.modulos['mm002_enc_sat_venta'].buscar(operacion_id=operacion_id)
+#encuesta = res[0]
 
 # Relaciono la encuesta creada con el cliente
 encuesta.relacionar(contacto, 'contact_id_c')
