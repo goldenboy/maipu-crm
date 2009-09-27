@@ -22,6 +22,8 @@ for linea in datos:
     objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Empleados'])
     for i in range(len(columnas)):
         objeto.importar_campo(columnas[i], unicode(campos[i], 'iso-8859-1'))
+        if i == 1:
+            objeto.importar_campo('name', unicode(campos[i], 'iso-8859-1'))
 #        print unicode(campos[i], 'iso-8859-1')
     objeto.grabar()
     print "1 objeto grabado."
