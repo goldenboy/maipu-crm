@@ -151,6 +151,7 @@ print objeto.grabar()
 encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_enc_sat_venta'])
 #objeto.importar_campo('contact_id_c', contact_id)
 encuesta.importar_campo('operacion_id', operacion_id)
+encuesta.importar_campo('name', operacion_id)
 encuesta.grabar()
 
 # si se grabo correctamente la encuesta, la deberia poder recuperar.
