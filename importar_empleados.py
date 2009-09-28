@@ -23,8 +23,8 @@ for linea in datos:
     for i in range(len(columnas)):
         objeto.importar_campo(columnas[i], unicode(campos[i], 'iso-8859-1'))
         if i == 1:
+            # Le doy un valor al campo 'name' del empleado.
             objeto.importar_campo('name', unicode(campos[i], 'iso-8859-1'))
-#        print unicode(campos[i], 'iso-8859-1')
     objeto.grabar()
     print "1 objeto grabado."
     

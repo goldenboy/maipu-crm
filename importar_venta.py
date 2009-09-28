@@ -132,6 +132,13 @@ elif len(res) == 0:
     print "Grabando una nueva sucursal..."
     obj_nuevo.grabar()
 
+
+# Voy a darle un valor al campo 'name', utilizando el ID de la operacion
+operacion_id = objeto.obtener_campo('operacion_id').a_sugar()
+objeto.importar_campo('name', operacion_id)
+
+
+
 # Aqui ya estan creadas todas las entradas en Sugar de las cuales esta venta
 # depende. Ya puedo agrear la venta a la base de datos.
 
@@ -143,8 +150,6 @@ print objeto.grabar()
 
 encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_enc_sat_venta'])
 #objeto.importar_campo('contact_id_c', contact_id)
-# Calculo el id de la operacion
-operacion_id = objeto.obtener_campo('operacion_id').a_sugar()
 encuesta.importar_campo('operacion_id', operacion_id)
 encuesta.grabar()
 

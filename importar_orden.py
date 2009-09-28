@@ -63,6 +63,11 @@ elif len(res) == 0:
     empleado = obj_nuevo
 
 
+# Voy a darle un valor al campo 'name', utilizando el Id de la orden
+orden_id = objeto.obtener_campo('orden_id').a_sugar()
+objeto.importar_campo('name', orden_id)
+
+
 
 print "Grabando una nueva ORDEN FACTURADA..."
 print objeto.grabar()
@@ -92,7 +97,7 @@ encuesta.grabar()
 #res = instancia.modulos['mm002_enc_sat_venta'].buscar(operacion_id=operacion_id)
 #encuesta = res[0]
 
-# Relaciono la encuesta creada con el cliente
+# Relaciono la encuesta creada con la orden de servicio
 encuesta.relacionar(objeto, 'mm002_enc_servicios_mm002_ordenes_name')
 
 
