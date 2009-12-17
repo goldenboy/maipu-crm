@@ -6,9 +6,6 @@ import commands
 
 cantidad = 10
 
-RESPUESTA_SI_NO = ['Si', 'No']
-GRADO_SATISFACCION = ['1', '2', '3', '4', '5']
-
 campos_opc = ['vent_gest_grado_satisfaccion', 'vent_entr_garantias',
         'vent_gest_cumplieron_plazos', 'vent_sop_recomendaria',
         'vent_vend_servicios_adicionale', 'vent_vend_grado_satisfaccion',
@@ -36,8 +33,6 @@ for i in range(cantidad):
     objeto.importar_campo('name', u'Encuesta automatica')
 
     for campo in campos_opc:
-        print campo
-        print objeto.campos[campo].opciones.keys()[1:]
         # Elijo una de las opciones posibles (que no sea '')
         eleccion = random.choice((objeto.campos[campo].opciones.keys())[1:])
         objeto.modificar_campo(campo, eleccion)
@@ -47,4 +42,5 @@ for i in range(cantidad):
         objeto.importar_campo(campo, unicode(texto))
     
     objeto.grabar()
+    print "1 objeto grabado satisfactoriamente"
 
