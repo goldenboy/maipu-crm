@@ -8,7 +8,7 @@ instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
                     crm_config.CLAVE, ['mm002_Ventas', 'mm002_Marcas',
                                         'mm002_Modelos', 'mm002_Tipo_venta',
                                         'mm002_Empleados', 'mm002_Sucursales',
-                                        'Contacts', 'mm002_enc_sat_venta'])
+                                        'Contacts', 'mm002_Encuesta'])
 
 # Creo un objeto nuevo del modulo Ventas.
 objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Ventas'])
@@ -23,7 +23,10 @@ datos = arch_datos.readlines()
 
 # Cargo todos los valores importados en el objeto que entrara en sugar.
 for campo in zip(campos, datos):
-    objeto.importar_campo(campo[0].rstrip(), campo[1].rstrip())
+    print campo[0] + ' -> ' + campo[1]
+    objeto.importar_campo(campo[0].rstrip(), unicode(campo[1].rstrip()))
+
+print "Objeto listo."
 
 # Verifico que todos los objetos externos referenciados (marca, modelo, etc...)
 # existan en Sugar y sean unicos. En caso de que no existan, los creo. Y si no
@@ -79,7 +82,7 @@ if len(res) > 1:
 elif len(res) == 0:
     # Debo crear un objeto tipo_venta nuevo y agregarlo.
     obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Tipo_venta'])
-    obj_nuevo.importar_campo('tipo_venta_codigo', valor)
+    obj_nuevo.importar_campo('tipo_venta_codigo', unicode(valor))
     obj_nuevo.importar_campo('tipo_venta_descripcion',
                     objeto.obtener_campo('tipo_venta_descripcion').a_sugar())
     print "Grabando un nuevo Tipo de Venta..."
@@ -97,7 +100,7 @@ elif len(res) == 0:
     obj_nuevo.importar_campo('empleados_legajo', valor)
     obj_nuevo.importar_campo('empleados_apellido_nombre',
                     objeto.obtener_campo('vendedor_nombre').a_sugar())
-    obj_nuevo.importar_campo('empleados_cargo', 'V')
+    obj_nuevo.importar_campo('empleados_cargo', unicode('V'))
     print "Grabando un nuevo vendedor..."
     obj_nuevo.grabar()
 
@@ -113,7 +116,7 @@ elif len(res) == 0:
     obj_nuevo.importar_campo('empleados_legajo', valor)
     obj_nuevo.importar_campo('empleados_apellido_nombre',
                     objeto.obtener_campo('gestor_nombre').a_sugar())
-    obj_nuevo.importar_campo('empleados_cargo', 'G')
+    obj_nuevo.importar_campo('empleados_cargo', unicode('G'))
     print "Grabando un nuevo gestor..."
     obj_nuevo.grabar()
 
@@ -148,9 +151,9 @@ print objeto.grabar()
 
 # Agrego una encuesta de satisfaccion
 
-encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_enc_sat_venta'])
+encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuesta'])
 #objeto.importar_campo('contact_id_c', contact_id)
-encuesta.importar_campo('operacion_id', operacion_id)
+encuesta.importar_campo('venta_id', operacion_id)
 encuesta.importar_campo('name', operacion_id)
 encuesta.grabar()
 
