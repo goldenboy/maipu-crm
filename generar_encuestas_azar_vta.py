@@ -4,7 +4,7 @@ import sys
 import random
 import commands
 
-cantidad = 10
+cantidad = 1
 
 campos_opc = ['vent_gest_grado_satisfaccion', 'vent_entr_garantias',
         'vent_gest_cumplieron_plazos', 'vent_sop_recomendaria',
@@ -23,8 +23,15 @@ campos_txt = ['por_que_decidio_visitarnos', 'vent_sop_para_muy_satisfecho',]
 
 # Me conecto a la instancia de SugarCRM.
 instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
-                    crm_config.CLAVE, ['mm002_Encuesta'])
+                    crm_config.CLAVE, ['mm002_Encuesta', 'Contacts'])
 
+
+# Tomo una muestra de clientes para asignarles las ventas
+contactos = instancia.modulos['Contacts'].buscar()
+
+
+
+# Genero las encuestas propiamente dichas
 for i in range(cantidad):
     # Creo un objeto nuevo del modulo Encuesta.
     objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Encuesta'])
@@ -41,6 +48,10 @@ for i in range(cantidad):
         texto = commands.getoutput('fortune /usr/share/games/fortunes/bofh-excuses')
         objeto.importar_campo(campo, unicode(texto))
     
+    
     objeto.grabar()
+    
+    # relaciono la encuesta con un contacto
+    objeto.relacionar(random.choice(contactos), 'contact_id_c')
     print "1 objeto grabado satisfactoriamente"
-
+    
