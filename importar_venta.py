@@ -58,8 +58,9 @@ elif len(res) == 0:
 
 
 # Luego hago lo mismo con el modelo
+valor_marca = valor
 valor = objeto.obtener_campo('modelos_codigo').a_sugar()
-res = instancia.modulos['mm002_Modelos'].buscar(modelos_codigo=valor)
+res = instancia.modulos['mm002_Modelos'].buscar(modelos_codigo=valor, marcas_codigo=valor_marca)
 if len(res) > 1:
     raise sugar.ErrorSugar('Hay modelos con ID duplicado')
 elif len(res) == 0:
@@ -154,6 +155,7 @@ print objeto.grabar()
 encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuesta'])
 #objeto.importar_campo('contact_id_c', contact_id)
 encuesta.importar_campo('venta_id', operacion_id)
+encuesta.importar_campo('tipo_encuesta', '1')
 encuesta.importar_campo('name', operacion_id)
 encuesta.grabar()
 

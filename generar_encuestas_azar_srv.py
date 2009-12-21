@@ -4,7 +4,7 @@ import sys
 import random
 import commands
 
-cantidad = 19
+cantidad = 20
 
 campos_opc = ['serv_gral_grado_satisfaccion', 'serv_turno_horario_turno_bueno',
             'serv_turno_facil_contactarse', 'serv_turno_horario_respetado',
@@ -35,6 +35,8 @@ for i in range(cantidad):
     objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Encuesta'])
     objeto.modificar_campo('tipo_encuesta', '0')
     objeto.importar_campo('encuesta_estado', u'Completed')
+    contacto_id = random.choice(contactos).obtener_campo('id').a_sugar()
+    objeto.importar_campo('contact_id_c', contacto_id)
     objeto.importar_campo('name', u'Encuesta de servicios automatica')
 
     for campo in campos_opc:
@@ -47,9 +49,10 @@ for i in range(cantidad):
         objeto.importar_campo(campo, unicode(texto))
     
     
-    objeto.grabar()
-    
+        
     # relaciono la encuesta con un contacto
-    objeto.relacionar(random.choice(contactos), 'contact_id_c')
+    #objeto.relacionar(random.choice(contactos), 'contact_id_c')
+    
+    objeto.grabar()
     print "1 objeto grabado satisfactoriamente"
     
