@@ -251,9 +251,10 @@ class InstanciaSugar:
         self.wsdl = SOAPpy.WSDL.Proxy(url)
 #        self.wsdl.soapproxy.config.dumpSOAPOut = 1
 #        self.wsdl.soapproxy.config.dumpSOAPIn = 1
-        
+        password = hashlib.md5()
+        password.update(clave)
         resultado = self.wsdl.login({'user_name': usuario,
-                            'password': hashlib.md5(clave).hexdigest(),
+                            'password': password.hexdigest(),
                             'version': '0.1'}, 'Sugar.py')
         if int(resultado['error']['number']) != 0:
             raise ErrorSugar('Error en parametros de autenticacion.')
