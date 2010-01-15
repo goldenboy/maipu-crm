@@ -314,7 +314,7 @@ class ModuloSugar:
                 self.campos_parametros[campo['name']] = None
 
 
-    def buscar(self, **consulta):
+    def buscar(self, inicio = 0, cantidad = 20, **consulta):
         """Devuelve la lista de objetos que cumplen con el criterio
         especificado."""
         
@@ -334,7 +334,8 @@ class ModuloSugar:
                                 ' = "' + consulta[clave] + '"'
 #        print str_cons        
         resultado = self.instancia.wsdl.get_entry_list(self.instancia.sesion,
-                                        self.nombre_modulo, str_cons, '', 0)
+                                        self.nombre_modulo, str_cons, '', inicio,
+                                        [], cantidad)
         
         lista = []
         for i in range(resultado['result_count']):

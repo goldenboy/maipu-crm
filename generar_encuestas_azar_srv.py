@@ -4,7 +4,7 @@ import sys
 import random
 import commands
 
-cantidad = 20
+cantidad = 10
 
 campos_opc = ['serv_gral_grado_satisfaccion', 'serv_turno_horario_turno_bueno',
             'serv_turno_facil_contactarse', 'serv_turno_horario_respetado',
