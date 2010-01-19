@@ -4,7 +4,7 @@ import sys
 import random
 import commands
 
-cantidad = 10
+cantidad = 1
 
 campos_opc = ['serv_gral_grado_satisfaccion', 'serv_turno_horario_turno_bueno',
             'serv_turno_facil_contactarse', 'serv_turno_horario_respetado',
@@ -21,7 +21,7 @@ campos_txt = ['serv_gral_observaciones', 'serv_grntia_por_que_no_vendra',
 
 # Me conecto a la instancia de SugarCRM.
 instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
-                    crm_config.CLAVE, ['mm002_Encuesta', 'Contacts'])
+                    crm_config.CLAVE, ['mm002_Encuestas', 'Contacts'])
 
 
 # Tomo una muestra de clientes para asignarles las ventas
@@ -32,11 +32,11 @@ contactos = instancia.modulos['Contacts'].buscar()
 # Genero las encuestas propiamente dichas
 for i in range(cantidad):
     # Creo un objeto nuevo del modulo Encuesta.
-    objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Encuesta'])
+    objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
     objeto.modificar_campo('tipo_encuesta', '0')
     objeto.importar_campo('encuesta_estado', u'Completed')
     contacto_id = random.choice(contactos).obtener_campo('id').a_sugar()
-    objeto.importar_campo('contact_id_c', contacto_id)
+#    objeto.importar_campo('contact_id_c', contacto_id)
     objeto.importar_campo('name', u'Encuesta de servicios automatica')
 
     for campo in campos_opc:
@@ -48,11 +48,12 @@ for i in range(cantidad):
         texto = commands.getoutput('fortune /usr/share/games/fortunes/bofh-excuses')
         objeto.importar_campo(campo, unicode(texto))
     
+    objeto.grabar()
+    print "1 objeto grabado satisfactoriamente"
     
         
     # relaciono la encuesta con un contacto
     #objeto.relacionar(random.choice(contactos), 'contact_id_c')
-    
-    objeto.grabar()
-    print "1 objeto grabado satisfactoriamente"
+    instancia.relacionar(random.choice(contactos), objeto)
+    print "1 objeto relacionado satisfactoriamente"
     

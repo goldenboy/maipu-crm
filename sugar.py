@@ -264,7 +264,16 @@ class InstanciaSugar:
         self.modulos = {}
         for modulo in modulos:
             self.modulos[modulo] = ModuloSugar(self, modulo)
-
+    
+    def relacionar(self, principal, secundario):
+        rel = {}
+        rel['module1'] = principal.modulo.nombre_modulo
+        rel['module1_id'] = principal.obtener_campo('id').a_sugar()
+        rel['module2'] = secundario.modulo.nombre_modulo
+        rel['module2_id'] = secundario.obtener_campo('id').a_sugar()
+        
+        self.wsdl.set_relationship(self.sesion, rel)
+        
 
 class ModuloSugar:
     """Clase que define un modulo accesible sobre Sugar."""
