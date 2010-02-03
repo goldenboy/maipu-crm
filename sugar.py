@@ -237,6 +237,7 @@ class TipoSugar_int(TipoSugar):
 
 TipoSugar_name = TipoSugar_varchar
 TipoSugar_parent_type = TipoSugar_varchar
+TipoSugar_user_name = TipoSugar_varchar
 
 
 class InstanciaSugar:
@@ -344,7 +345,7 @@ class ModuloSugar:
 #        print str_cons        
         resultado = self.instancia.wsdl.get_entry_list(self.instancia.sesion,
                                         self.nombre_modulo, str_cons, '', inicio,
-                                        [], cantidad)
+                                        [], cantidad, 0)
         
         lista = []
         for i in range(resultado['result_count']):
