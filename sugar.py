@@ -5,6 +5,7 @@ import SOAPpy
 import hashlib
 import types
 import time
+from Crypto.Cipher import DES3
 
 class ErrorSugar(Exception):
     def __init__(self, value):
@@ -244,7 +245,7 @@ class InstanciaSugar:
     """Una instancia de Sugar es una instalacion en particular, es decir
     los datos para accederla: URL, nombre de usuario, contrasena."""
     
-    def __init__(self, url, usuario, clave, modulos):
+    def __init__(self, url, usuario, clave, modulos, clave_ldap, iv_ldap):
         self.url = url
         self.usuario = usuario
         self.clave = clave
@@ -252,11 +253,27 @@ class InstanciaSugar:
         self.wsdl = SOAPpy.WSDL.Proxy(url)
 #        self.wsdl.soapproxy.config.dumpSOAPOut = 1
 #        self.wsdl.soapproxy.config.dumpSOAPIn = 1
-        password = hashlib.md5()
-        password.update(clave)
+        
+        # Uso la clave ldap_key para crear el cipher para encriptar la clave de
+        # usuario
+        ldap_key = hashlib.md5(clave_ldap).hexdigest()[:24]
+        cipher = DES3.new(ldap_key, DES3.MODE_CBC, iv_ldap)
+        
+        # Encripto el hash del LDAP, y obtengo el resultado en hexa
+        ciphertext_bin = cipher.encrypt(clave)
+        ciphertext_hex = ''
+        for byte in ciphertext_bin:
+            ciphertext_hex += "%02x" % ord(byte)
+        
+        
+#        password = hashlib.md5()
+#        password.update(clave)
+#        resultado = self.wsdl.login({'user_name': usuario,
+#                            'password': password.hexdigest(),
+#                            'version': '0.1'}, 'Sugar.py')
         resultado = self.wsdl.login({'user_name': usuario,
-                            'password': password.hexdigest(),
-                            'version': '0.1'}, 'Sugar.py')
+                            'password': ciphertext_hex,
+                            'version': '0.2'}, 'Sugar.py')
         if int(resultado['error']['number']) != 0:
             raise ErrorSugar('Error en parametros de autenticacion.')
         
