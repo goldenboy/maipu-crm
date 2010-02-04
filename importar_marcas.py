@@ -5,7 +5,8 @@ import sys
 
 # Me conecto a la instancia de SugarCRM.
 instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
-                    crm_config.CLAVE, ['mm002_Marcas'])
+                    crm_config.CLAVE, ['mm002_Marcas'], crm_config.LDAP_KEY,
+                    crm_config.LDAP_IV)
 
 # La lista 'campos' tiene los nombres de las columnas ordenadas correctamente.
 columnas = ['marcas_codigo', 'marcas_descripcion']

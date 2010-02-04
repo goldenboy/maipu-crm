@@ -5,7 +5,8 @@ import sys
 
 # Me conecto a la instancia de SugarCRM.
 instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
-                                    crm_config.CLAVE, ['Contacts'])
+                                    crm_config.CLAVE, ['Contacts'],
+                                    crm_config.LDAP_KEY, crm_config.LDAP_IV)
 
 # Creo un objeto nuevo del modulo Contacts.
 objeto = sugar.ObjetoSugar(instancia.modulos['Contacts'])

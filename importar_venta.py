@@ -6,9 +6,10 @@ import sys
 # Me conecto a la instancia de SugarCRM.
 instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
                     crm_config.CLAVE, ['mm002_Ventas', 'mm002_Marcas',
-                                        'mm002_Modelos', 'mm002_Tipo_venta',
-                                        'mm002_Empleados', 'mm002_Sucursales',
-                                        'Contacts', 'mm002_Encuesta'])
+                                        'mm002_Modelo', 'mm002_Tipo_venta',
+                                        'mm002_Sucursales',
+                                        'Contacts', 'mm002_Encuestas'],
+                    crm_config.LDAP_KEY, crm_config.LDAP_IV)
 
 # Creo un objeto nuevo del modulo Ventas.
 objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Ventas'])
@@ -60,12 +61,12 @@ elif len(res) == 0:
 # Luego hago lo mismo con el modelo
 valor_marca = valor
 valor = objeto.obtener_campo('modelos_codigo').a_sugar()
-res = instancia.modulos['mm002_Modelos'].buscar(modelos_codigo=valor, marcas_codigo=valor_marca)
+res = instancia.modulos['mm002_Modelo'].buscar(modelos_codigo=valor, marcas_codigo=valor_marca)
 if len(res) > 1:
     raise sugar.ErrorSugar('Hay modelos con ID duplicado')
 elif len(res) == 0:
     # Debo crear un objeto modelo nuevo y agregarlo.
-    obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Modelos'])
+    obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Modelo'])
     obj_nuevo.importar_campo('modelos_codigo', valor)
     obj_nuevo.importar_campo('modelos_descripcion',
                         objeto.obtener_campo('modelos_descripcion').a_sugar())
@@ -91,35 +92,35 @@ elif len(res) == 0:
 
 
 # Luego veo que el vendedor este cargado, y si no lo esta, lo agrego.
-valor = objeto.obtener_campo('vendedor_codigo').a_sugar()
-res = instancia.modulos['mm002_Empleados'].buscar(empleados_legajo=valor)
-if len(res) > 1:
-    raise sugar.ErrorSugar('Hay empleados con ID duplicado')
-elif len(res) == 0:
-    # Debo crear un objeto empleado nuevo y agregarlo como vendedor.
-    obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Empleados'])
-    obj_nuevo.importar_campo('empleados_legajo', valor)
-    obj_nuevo.importar_campo('empleados_apellido_nombre',
-                    objeto.obtener_campo('vendedor_nombre').a_sugar())
-    obj_nuevo.importar_campo('empleados_cargo', unicode('V'))
-    print "Grabando un nuevo vendedor..."
-    obj_nuevo.grabar()
+#valor = objeto.obtener_campo('vendedor_codigo').a_sugar()
+#res = instancia.modulos['mm002_Empleados'].buscar(empleados_legajo=valor)
+#if len(res) > 1:
+#    raise sugar.ErrorSugar('Hay empleados con ID duplicado')
+#elif len(res) == 0:
+#    # Debo crear un objeto empleado nuevo y agregarlo como vendedor.
+#    obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Empleados'])
+#    obj_nuevo.importar_campo('empleados_legajo', valor)
+#    obj_nuevo.importar_campo('empleados_apellido_nombre',
+#                    objeto.obtener_campo('vendedor_nombre').a_sugar())
+#    obj_nuevo.importar_campo('empleados_cargo', unicode('V'))
+#    print "Grabando un nuevo vendedor..."
+#    obj_nuevo.grabar()
 
 
 # Luego veo que el gestor este cargado, y si no lo esta, lo agrego.
-valor = objeto.obtener_campo('gestor_codigo').a_sugar()
-res = instancia.modulos['mm002_Empleados'].buscar(empleados_legajo=valor)
-if len(res) > 1:
-    raise sugar.ErrorSugar('Hay empleados con ID duplicado')
-elif len(res) == 0:
-    # Debo crear un objeto empleado nuevo y agregarlo como gestor.
-    obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Empleados'])
-    obj_nuevo.importar_campo('empleados_legajo', valor)
-    obj_nuevo.importar_campo('empleados_apellido_nombre',
-                    objeto.obtener_campo('gestor_nombre').a_sugar())
-    obj_nuevo.importar_campo('empleados_cargo', unicode('G'))
-    print "Grabando un nuevo gestor..."
-    obj_nuevo.grabar()
+#valor = objeto.obtener_campo('gestor_codigo').a_sugar()
+#res = instancia.modulos['mm002_Empleados'].buscar(empleados_legajo=valor)
+#if len(res) > 1:
+#    raise sugar.ErrorSugar('Hay empleados con ID duplicado')
+#elif len(res) == 0:
+#    # Debo crear un objeto empleado nuevo y agregarlo como gestor.
+#    obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Empleados'])
+#    obj_nuevo.importar_campo('empleados_legajo', valor)
+#    obj_nuevo.importar_campo('empleados_apellido_nombre',
+#                    objeto.obtener_campo('gestor_nombre').a_sugar())
+#    obj_nuevo.importar_campo('empleados_cargo', unicode('G'))
+#    print "Grabando un nuevo gestor..."
+#    obj_nuevo.grabar()
 
 
 # Por ultimo veo que la sucursal este cargada, y si no lo esta, la agrego.
@@ -152,10 +153,11 @@ print objeto.grabar()
 
 # Agrego una encuesta de satisfaccion
 
-encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuesta'])
+encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
 #objeto.importar_campo('contact_id_c', contact_id)
 encuesta.importar_campo('venta_id', operacion_id)
 encuesta.importar_campo('tipo_encuesta', '1')
+encuesta.importar_campo('encuesta_estado', 'Not Started')
 encuesta.importar_campo('name', operacion_id)
 encuesta.grabar()
 
@@ -165,7 +167,7 @@ encuesta.grabar()
 #encuesta = res[0]
 
 # Relaciono la encuesta creada con el cliente
-encuesta.relacionar(contacto, 'contact_id_c')
-
+#encuesta.relacionar(contacto, 'contact_id_c')
+instancia.relacionar(contacto, encuesta)
 
 

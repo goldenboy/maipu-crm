@@ -6,7 +6,8 @@ import crm_config
 
 # Me conecto a la instancia de SugarCRM.
 instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
-                                    crm_config.CLAVE, ['Contacts'])
+                                    crm_config.CLAVE, ['Contacts'],
+                                    crm_config.LDAP_KEY, crm_config.LDAP_IV)
 
 # Obtengo los contactos que tengan como primer nombre "Hai". Supongo que existen
 # registros.

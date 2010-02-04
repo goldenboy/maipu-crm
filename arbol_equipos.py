@@ -14,9 +14,10 @@ def arbol(padre, nivel):
 
 # Me conecto a la instancia de SugarCRM.
 instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
-                    crm_config.CLAVE, ['CETeams'])
+                    crm_config.CLAVE, ['CETeams'], crm_config.LDAP_KEY,
+                    crm_config.LDAP_IV)
 
-res = instancia.modulos['CETeams'].buscar()
+res = instancia.modulos['CETeams'].buscar(cantidad=100)
 
 relacion = {}
 raices = []
