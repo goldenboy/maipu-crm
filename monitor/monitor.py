@@ -2,40 +2,71 @@ import pyinotify
 import monitor_config
 import imp
 import logging
+import os
+from sugar import ErrorSugar
 
 
 # Configuro el logging
-logging.basicConfig(level=logging.eval('WARNING'))
+logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
+logger = logging.getLogger("monitor")
 
 wm = pyinotify.WatchManager()  # Watch Manager
 mask = pyinotify.IN_CLOSE_WRITE  # watched events
 
 class HandleEvents(pyinotify.ProcessEvent):
     def process_IN_CLOSE_WRITE(self, event):
+        logger.debug("Ingreso al manejador del evento")
         
         # Primero identifico el codigo que debo llamar. Para eso recorro la
         # lista monitor_config.PATHS hasta encontrar un patron coincidente.
         for tupla in monitor_config.PATHS:
+            logger.debug(monitor_config.DIR_BASE + tupla[0])
             # Si coincide con el patron ejecuto el codigo apropiado
             if event.pathname.startswith(monitor_config.DIR_BASE + tupla[0]):
                 # Tengo que importar el modulo dinamicamente
-                i_file, i_filename, i_tuple = 
-                    imp.find_module(tupla[1], monitor_config.PLUGIN_DIRS)
+                i_file, i_filename, i_tuple = imp.find_module(tupla[1],
+						monitor_config.PLUGIN_DIRS)
+			    logger.debug("Cargo el modulo correspondiente")
                 modulo = imp.load_module(tupla[1], i_file, i_filename, i_tuple)
-                
+
                 # Habiendo importado el modulo, llamo a la funcion que procesa
                 # el archivo, pasando su ruta como parametro
-                modulo.procesar(event.pathname)
-                print "Pase por aca"
+                try:
+                    logger.debug("Proceso el archivo " + event.pathname)
+                    modulo.procesar(event.pathname)
+                    
+                    # Si funciono correctamente, paso por aca. Tengo que borrar
+                    # el archivo
+                    os.remove(event.pathname)
+                    
+                except ErrorSugar:
+                    # Si paso por aca es porque hubo algun problema con la
+                    # importacion.
+                    
+                    # Doy mensaje de error
+                    logger.debug("Error en la importacion")
+                    
+                    # Muevo el archivo a la carpeta de errores
+                    logger.debug(event.pathname)
+                    logger.debug(monitor_config.DIR_ERR +
+                                event.pathname[len(monitor_config.DIR_BASE):])
+                    os.rename(event.pathname, monitor_config.DIR_ERR +
+                                event.pathname[len(monitor_config.DIR_BASE):])
+                
                 break
         else:
             # Aviso que ningun patron coincide
-            print "Ningun Patron Coincide"
-            
-        # Si todo salio bien, borro el archivo, sino, muevo a carpeta de error
-        print "Close_write:", event.pathname
+            logger.warning("Ningun patron coincide. Moviendo archivo: " +
+                            event.pathname)
+            # Muevo el archivo a la carpeta de errores
+            logger.debug(event.pathname)
+            logger.debug(monitor_config.DIR_ERR +
+                            event.pathname[len(monitor_config.DIR_BASE):])
+            os.rename(event.pathname, monitor_config.DIR_ERR +
+                                event.pathname[len(monitor_config.DIR_BASE):])
 
     def process_default(self, event):
+        # Para el resto de los eventos no quiero que pase nada.
         pass
 
 notifier = pyinotify.Notifier(wm, HandleEvents())
