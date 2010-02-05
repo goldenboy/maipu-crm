@@ -126,7 +126,7 @@ def procesar(pathname):
 if __name__ == '__main__':
     import sys
     
-    sys.path.insert(0, RAIZ_SCRIPTS)
+    sys.path.insert(0, plugins_config.RAIZ_SCRIPTS)
     procesar(sys.argv[1])
 
 
