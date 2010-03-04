@@ -7,8 +7,8 @@ def procesar(pathname):
     # Me conecto a la instancia de SugarCRM.
     instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
                     crm_config.CLAVE, ['mm002_Ventas', 'mm002_Marcas',
-                                        'mm002_Modelo', 
-                                        'mm002_Sucursales',
+                                        'mm002_Modelo', 'mm002_Catalogos',
+                                        'mm002_Tipo_venta', 'mm002_Sucursales',
                                         'Contacts', 'mm002_Encuestas'],
                     crm_config.LDAP_KEY, crm_config.LDAP_IV)
 
@@ -18,9 +18,11 @@ def procesar(pathname):
     # Defino la plantilla con los campos.
     campos = ['operacion_id', 'id_maipu_cliente', 'marcas_codigo',
             'marcas_descripcion', 'modelos_codigo', 'modelos_descripcion',
+            'catalogos_codigo', 'catalogos_descripcion',
             'fecha_venta', 'tipo_venta_codigo', 'tipo_venta_descripcion',
             'vendedor_codigo', 'vendedor_nombre', 'sucursales_codigo',
-            'sucursales_descripcion', 'gestor_codigo', 'gestor_nombre']
+            'sucursales_descripcion', 'gestor_codigo', 'gestor_nombre',
+            'patenta_maipu']
 
     # Lo mismo con el archivo de datos.
     arch_datos = open(pathname)
@@ -79,6 +81,23 @@ def procesar(pathname):
         print "Grabando un nuevo Modelo..."
         obj_nuevo.grabar()
 
+    # Luego hago lo mismo con el catalogo
+    valor_modelo = valor
+    valor = objeto.obtener_campo('catalogs_codigo').a_sugar()
+    res = instancia.modulos['mm002_Catalogos'].buscar(modelos_codigo=valor_modelo, marcas_codigo=valor_marca, catalogos_codigo=valor)
+    if len(res) > 1:
+        raise sugar.ErrorSugar('Hay catalogos con ID duplicado')
+    elif len(res) == 0:
+        # Debo crear un objeto catalogo nuevo y agregarlo.
+        obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Catalogos'])
+        obj_nuevo.importar_campo('modelos_codigo', valor_modelo)
+        obj_nuevo.importar_campo('marcas_codigo', valor_marca)
+        obj_nuevo.importar_campo('catalogos_codigo', valor)
+        obj_nuevo.importar_campo('catalogos_descripcion',
+                        objeto.obtener_campo('catalogos_descripcion').a_sugar())
+        print "Grabando un nuevo Catalogo..."
+        obj_nuevo.grabar()
+
 
     # Por ultimo veo que la sucursal este cargada, y si no lo esta, la agrego.
     valor = objeto.obtener_campo('sucursales_codigo').a_sugar()
@@ -100,7 +119,6 @@ def procesar(pathname):
     objeto.importar_campo('name', operacion_id)
 
 
-
     # Aqui ya estan creadas todas las entradas en Sugar de las cuales esta venta
     # depende. Ya puedo agrear la venta a la base de datos.
 
@@ -113,11 +131,12 @@ def procesar(pathname):
     encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
     encuesta.importar_campo('venta_id', operacion_id)
     encuesta.importar_campo('tipo_encuesta', '1')
+    encuesta.importar_campo('patenta_maipu',
+                    objeto.obtener_campo('patenta_maipu').a_sugar())
     encuesta.importar_campo('name', operacion_id)
     encuesta.grabar()
 
     # Relaciono la encuesta creada con el cliente
-    #encuesta.relacionar(contacto, 'contact_id_c')
     instancia.relacionar(contacto, encuesta)
     
     return True
