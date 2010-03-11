@@ -184,7 +184,7 @@ class TipoSugar_date(TipoSugar):
     En SugarCRM el formato es YYYY-MM-DD"""
     def __init__(self, valor_inicial = None, opciones = None):
         try:
-            self.valor = time.strptime(valor_inicial, '%Y-%m-%d')
+            self.valor = time.strptime(valor_inicial, '%Y%m%d')
         except Exception:
             self.valor = None
     
@@ -195,7 +195,7 @@ class TipoSugar_date(TipoSugar):
     
     def a_sugar(self):
         try:
-            valor = "%04i-%02i-%02i" % (self.valor.tm_year, self.valor.tm_mon,
+            valor = "%04i%02i%02i" % (self.valor.tm_year, self.valor.tm_mon,
                                     self.valor.tm_mday)
             return valor
         except AttributeError:
@@ -203,7 +203,7 @@ class TipoSugar_date(TipoSugar):
 
     def de_string(self, valor):
         try:
-            valor_nuevo = time.strptime(valor, '%Y-%m-%d')
+            valor_nuevo = time.strptime(valor, '%Y%m%d')
             return valor_nuevo
         except ValueError:
             return None
@@ -239,6 +239,7 @@ class TipoSugar_int(TipoSugar):
 TipoSugar_name = TipoSugar_varchar
 TipoSugar_parent_type = TipoSugar_varchar
 TipoSugar_user_name = TipoSugar_varchar
+TipoSugar_url = TipoSugar_varchar
 
 
 class InstanciaSugar:
