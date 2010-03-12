@@ -4,7 +4,7 @@ import sys
 import random
 import commands
 
-cantidad = 1
+cantidad = 10
 
 campos_opc = ['serv_gral_grado_satisfaccion', 'serv_turno_horario_turno_bueno',
             'serv_turno_facil_contactarse', 'serv_turno_horario_respetado',
@@ -14,10 +14,9 @@ campos_opc = ['serv_gral_grado_satisfaccion', 'serv_turno_horario_turno_bueno',
             'serv_entrega_factura_clara', 'serv_entrega_monto_acorde',
             'serv_taller_buena_reparacion', 'serv_taller_ultima_visita',
             'serv_gral_nos_recomendaria', 'serv_grntia_vendrasin_garantia',
-            'serv_grntia_auto_en_garantia', 'marca']
+            'serv_grntia_auto_en_garantia', 'por_que_decidio_visitarnos']
 
-campos_txt = ['serv_gral_observaciones', 'serv_grntia_por_que_no_vendra',
-            'por_que_decidio_visitarnos']
+campos_txt = ['serv_gral_observaciones', 'serv_grntia_por_que_no_vendra']
 
 # Me conecto a la instancia de SugarCRM.
 instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
@@ -35,9 +34,7 @@ for i in range(cantidad):
     # Creo un objeto nuevo del modulo Encuesta.
     objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
     objeto.modificar_campo('tipo_encuesta', '0')
-    objeto.importar_campo('encuesta_estado', u'Completed')
-    contacto_id = random.choice(contactos).obtener_campo('id').a_sugar()
-#    objeto.importar_campo('contact_id_c', contacto_id)
+    objeto.importar_campo('encuesta_estado', u'Completada')
     objeto.importar_campo('name', u'Encuesta de servicios automatica')
 
     for campo in campos_opc:
@@ -52,9 +49,6 @@ for i in range(cantidad):
     objeto.grabar()
     print "1 objeto grabado satisfactoriamente"
     
-        
     # relaciono la encuesta con un contacto
-    #objeto.relacionar(random.choice(contactos), 'contact_id_c')
     instancia.relacionar(random.choice(contactos), objeto)
-    print "1 objeto relacionado satisfactoriamente"
     

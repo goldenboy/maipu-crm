@@ -5,10 +5,9 @@ import sys
 
 # Me conecto a la instancia de SugarCRM.
 instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
-                    crm_config.CLAVE, ['mm002_Marcas', 'mm002_Modelos', 
-                                        'mm002_Empleados', 'Contacts',
-                                        'mm002_Turnos'], crm_config.LDAP_KEY,
-                    crm_config.LDAP_IV)
+                    crm_config.CLAVE, ['mm002_Marcas', 'mm002_Modelo', 
+                                       'Contacts', 'mm002_Turnos'],
+                    crm_config.LDAP_KEY, crm_config.LDAP_IV)
 
 # Creo un objeto nuevo del modulo Turnos.
 objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Turnos'])

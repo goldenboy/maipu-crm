@@ -1,10 +1,19 @@
 import plugins_config
+import monitor_config
+import logging
+import types
+
+
+# Configuro el logging
+logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
+logger = logging.getLogger("importar_venta")
 
 def procesar(pathname):
     import sugar
     import crm_config
     
     # Me conecto a la instancia de SugarCRM.
+    logger.debug("Conectando a instancia")
     instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
                     crm_config.CLAVE, ['mm002_Ventas', 'mm002_Marcas',
                                         'mm002_Modelo', 'mm002_Catalogos',
@@ -16,7 +25,7 @@ def procesar(pathname):
     objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Ventas'])
 
     # Defino la plantilla con los campos.
-    campos = ['operacion_id', 'id_maipu_cliente', 'marcas_codigo',
+    campos = ['operacion_id', 'id_maipu_cliente', 'nombre_cliente', 'marcas_codigo',
             'marcas_descripcion', 'modelos_codigo', 'modelos_descripcion',
             'catalogos_codigo', 'catalogos_descripcion',
             'fecha_venta', 'tipo_venta_codigo', 'tipo_venta_descripcion',
@@ -39,13 +48,24 @@ def procesar(pathname):
     # existan en Sugar y sean unicos. En caso de que no existan, los creo. Y si no
     # son unicos, salgo emitiendo un error.
 
-    # Primero, verifico que exista el cliente.
+    # Primero, verifico que exista el cliente, y si no lo esta, lo agrego
     valor = objeto.obtener_campo('id_maipu_cliente').a_sugar()
     res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
-    if len(res) != 1:
-        raise sugar.ErrorSugar('No existe un solo cliente con ese ID')
+    if len(res) > 1:
+        raise sugar.ErrorSugar('Existen clientes duplicados con ese ID')
+    elif len(res) == 0:
+        # Debo crear un objeto cliente nuevo y agregarlo.
+        obj_nuevo = sugar.ObjetoSugar(instancia.modulos['Contacts'])
+        obj_nuevo.importar_campo('id_maipu_c', valor)
+        obj_nuevo.importar_campo('last_name',
+                        objeto.obtener_campo('nombre_cliente').a_sugar())
+        print "Grabando un nuevo cliente..."
+        obj_nuevo.grabar()
+        contacto = obj_nuevo
+    else:
+        contacto = res[0]
+
     # Guardo el ID de sugar para mas tarde
-    contacto = res[0]
     contact_id = contacto.obtener_campo('id').a_sugar()
 
 
@@ -83,7 +103,7 @@ def procesar(pathname):
 
     # Luego hago lo mismo con el catalogo
     valor_modelo = valor
-    valor = objeto.obtener_campo('catalogs_codigo').a_sugar()
+    valor = objeto.obtener_campo('catalogos_codigo').a_sugar()
     res = instancia.modulos['mm002_Catalogos'].buscar(modelos_codigo=valor_modelo, marcas_codigo=valor_marca, catalogos_codigo=valor)
     if len(res) > 1:
         raise sugar.ErrorSugar('Hay catalogos con ID duplicado')
@@ -131,6 +151,7 @@ def procesar(pathname):
     encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
     encuesta.importar_campo('venta_id', operacion_id)
     encuesta.importar_campo('tipo_encuesta', '1')
+    encuesta.importar_campo('encuesta_estado', 'No iniciada')
     encuesta.importar_campo('patenta_maipu',
                     objeto.obtener_campo('patenta_maipu').a_sugar())
     encuesta.importar_campo('name', operacion_id)

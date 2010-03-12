@@ -157,7 +157,7 @@ encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
 #objeto.importar_campo('contact_id_c', contact_id)
 encuesta.importar_campo('venta_id', operacion_id)
 encuesta.importar_campo('tipo_encuesta', '1')
-encuesta.importar_campo('encuesta_estado', 'Not Started')
+encuesta.importar_campo('encuesta_estado', 'NO_INICIADA')
 encuesta.importar_campo('name', operacion_id)
 encuesta.grabar()
 
