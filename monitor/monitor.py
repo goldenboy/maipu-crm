@@ -26,7 +26,7 @@ class HandleEvents(pyinotify.ProcessEvent):
                 # Tengo que importar el modulo dinamicamente
                 i_file, i_filename, i_tuple = imp.find_module(tupla[1],
 						monitor_config.PLUGIN_DIRS)
-			    logger.debug("Cargo el modulo correspondiente")
+                logger.debug("Cargo el modulo correspondiente")
                 modulo = imp.load_module(tupla[1], i_file, i_filename, i_tuple)
 
                 # Habiendo importado el modulo, llamo a la funcion que procesa
@@ -38,6 +38,7 @@ class HandleEvents(pyinotify.ProcessEvent):
                     # Si funciono correctamente, paso por aca. Tengo que borrar
                     # el archivo
                     os.remove(event.pathname)
+                    break
                     
                 except ErrorSugar:
                     # Si paso por aca es porque hubo algun problema con la
@@ -52,8 +53,8 @@ class HandleEvents(pyinotify.ProcessEvent):
                                 event.pathname[len(monitor_config.DIR_BASE):])
                     os.rename(event.pathname, monitor_config.DIR_ERR +
                                 event.pathname[len(monitor_config.DIR_BASE):])
+                    break
                 
-                break
         else:
             # Aviso que ningun patron coincide
             logger.warning("Ningun patron coincide. Moviendo archivo: " +
@@ -78,4 +79,4 @@ except KeyboardInterrupt:
     wm.rm_watch(wdd.values())
     notifier.stop()
 
-
+    
