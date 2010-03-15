@@ -3,8 +3,7 @@
 
 DIR_BASE = '/srv/CRM/procesar'
 DIR_ERR = '/srv/CRM/error'
-DIR_SUGAR = '/home/luis/Documentos/maipu/maipu-crm'
-PLUGIN_DIRS = ['plugins/']
+PLUGIN_DIRS = ['./']
 LOG_LEVEL = 'debug'
 
 
@@ -29,5 +28,3 @@ LOG_LEVELS = {'debug': logging.DEBUG,
             'error': logging.ERROR,
             'critical': logging.CRITICAL}
 
-import sys
-sys.path.append(DIR_SUGAR)

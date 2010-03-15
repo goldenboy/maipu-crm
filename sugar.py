@@ -391,6 +391,7 @@ class ObjetoSugar:
         self.campos = {}
         self.campos_sucios = []
         for campo in self.modulo.campos:
+            print campo
             # Para cada campo posible en el modulo, hago:
             opciones = self.modulo.campos_parametros[campo]
             self.campos[campo] = eval(self.modulo.campos_tipo[campo])\
