@@ -1,3 +1,11 @@
+import monitor_config
+import logging
+
+
+# Configuro el logging
+logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
+logger = logging.getLogger("importar_turno")
+
 
 def procesar(pathname):
     import sugar
@@ -27,10 +35,10 @@ def procesar(pathname):
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
-        print campo[0] + ' -> ' + campo[1]
+        logger.debug(campo[0] + ' -> ' + campo[1])
         objeto.importar_campo(campo[0].rstrip(), unicode(campo[1].rstrip()))
 
-    print "Objeto listo."
+    logger.debug("Objeto listo.")
 
     # Verifico que todos los objetos externos referenciados (marca, modelo, etc...)
     # existan en Sugar y sean unicos. En caso de que no existan, los creo. Y si no
@@ -57,7 +65,7 @@ def procesar(pathname):
         obj_nuevo.importar_campo('marcas_codigo', valor)
         obj_nuevo.importar_campo('marcas_descripcion',
                         objeto.obtener_campo('marcas_descripcion').a_sugar())
-        print "Grabando una nueva Marca..."
+        logger.debug("Grabando una nueva Marca...")
         obj_nuevo.grabar()
 
 
@@ -75,7 +83,7 @@ def procesar(pathname):
                         objeto.obtener_campo('modelos_descripcion').a_sugar())
         obj_nuevo.importar_campo('marcas_codigo',
                         objeto.obtener_campo('marcas_codigo').a_sugar())
-        print "Grabando un nuevo Modelo..."
+        logger.debug("Grabando un nuevo Modelo...")
         obj_nuevo.grabar()
 
 
@@ -90,7 +98,7 @@ def procesar(pathname):
         obj_nuevo.importar_campo('sucursales_codigo', valor)
         obj_nuevo.importar_campo('sucursales_descripcion',
                     objeto.obtener_campo('sucursales_descripcion').a_sugar())
-        print "Grabando una nueva sucursal..."
+        logger.debug("Grabando una nueva sucursal...")
         obj_nuevo.grabar()
 
 
@@ -103,8 +111,8 @@ def procesar(pathname):
     # Aqui ya estan creadas todas las entradas en Sugar de las cuales esta venta
     # depende. Ya puedo agrear la venta a la base de datos.
 
-    print "Grabando una nueva VENTA..."
-    print objeto.grabar()
+    logger.debug("Grabando una nueva VENTA...")
+    logger.debug(objeto.grabar())
 
 
     # Agrego una encuesta de satisfaccion
@@ -116,7 +124,6 @@ def procesar(pathname):
     encuesta.grabar()
 
     # Relaciono la encuesta creada con el cliente
-    #encuesta.relacionar(contacto, 'contact_id_c')
     instancia.relacionar(contacto, encuesta)
     
     return True
