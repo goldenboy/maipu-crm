@@ -20,7 +20,7 @@ def procesar(pathname):
                                         'Contacts', 'mm002_Encuestas'],
                     crm_config.LDAP_KEY, crm_config.LDAP_IV)
 
-    # Lo mismo con el archivo de datos.
+    # Leo el archivo de datos.
     arch_datos = open(pathname)
     datos = arch_datos.readlines()
 

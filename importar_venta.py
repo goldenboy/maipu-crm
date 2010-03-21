@@ -31,7 +31,7 @@ def procesar(pathname):
             'sucursales_descripcion', 'gestor_codigo', 'gestor_nombre',
             'patenta_maipu']
 
-    # Lo mismo con el archivo de datos.
+    # Leo el archivo de datos.
     arch_datos = open(pathname)
     datos = arch_datos.readlines()
 
