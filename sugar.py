@@ -184,7 +184,7 @@ class TipoSugar_date(TipoSugar):
     En SugarCRM el formato es YYYY-MM-DD"""
     def __init__(self, valor_inicial = None, opciones = None):
         try:
-            self.valor = time.strptime(valor_inicial, '%Y%m%d')
+            self.valor = time.strptime(valor_inicial, '%Y-%m-%d')
         except Exception:
             self.valor = None
     
@@ -195,7 +195,7 @@ class TipoSugar_date(TipoSugar):
     
     def a_sugar(self):
         try:
-            valor = "%04i%02i%02i" % (self.valor.tm_year, self.valor.tm_mon,
+            valor = "%04i-%02i-%02i" % (self.valor.tm_year, self.valor.tm_mon,
                                     self.valor.tm_mday)
             return valor
         except AttributeError:
@@ -203,7 +203,7 @@ class TipoSugar_date(TipoSugar):
 
     def de_string(self, valor):
         try:
-            valor_nuevo = time.strptime(valor, '%Y%m%d')
+            valor_nuevo = time.strptime(valor, '%Y-%m-%d')
             return valor_nuevo
         except ValueError:
             return None
@@ -391,7 +391,7 @@ class ObjetoSugar:
         self.campos = {}
         self.campos_sucios = []
         for campo in self.modulo.campos:
-            print campo
+#            print campo
             # Para cada campo posible en el modulo, hago:
             opciones = self.modulo.campos_parametros[campo]
             self.campos[campo] = eval(self.modulo.campos_tipo[campo])\
