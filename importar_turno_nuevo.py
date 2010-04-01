@@ -38,22 +38,22 @@ def procesar(instancia, pathname):
 
     # Defino la plantilla con los campos.
     campos = ['turno_id', 'nombre_contacto', 'nombre_cliente',
-            'cliente_id', 'orden_id', 'telefono_uno',
+            'cliente_id', 'cliente_dni', 'telefono_uno',
             'telefono_dos', 'dominio', 'fecha_turno',
             'hora_turno', 'motivo_turno', 'asesor_codigo',
             'asesor_nombre', 'fecha_entrega', 'hora_entrega', 'estado_turno',
-            'marcas_codigo', 'marcas_descripcion', 'dunno3',
-            'dunno2', 'garantia', 'dunno']
+            'sucursales_codigo',
+            'marcas_codigo', 'marcas_descripcion', 'modelos_codigo', 'modelos_descripcion',
+            'catalogos_codigo', 'catalogos_descripcion', 'orden_id', 'garantia']
     # hago copia y quito los elementos que no van al sugar
     campos_utiles = []
     for campo in campos:
         campos_utiles.append(campo)
 #    campos_utiles.remove('nombre_cliente')
-#    campos_utiles.remove('estado_turno')
-    campos_utiles.remove('dunno')
-    campos_utiles.remove('dunno2')
-    campos_utiles.remove('dunno3')
+    campos_utiles.remove('cliente_dni')
     campos_utiles.remove('marcas_descripcion')
+    campos_utiles.remove('modelos_descripcion')
+    campos_utiles.remove('catalogos_descripcion')
 
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
@@ -104,6 +104,7 @@ def procesar(instancia, pathname):
         contacto.importar_campo('phone_home', datos[5])
         contacto.importar_campo('phone_other', datos[6])
         contacto.importar_campo('id_maipu_c', datos[3])
+        contacto.importar_campo('dni_numero_c', datos[4])
         logger.debug("Grabando cliente.")
         contacto.grabar()
     else:
