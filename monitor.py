@@ -4,6 +4,7 @@ import imp
 import logging
 import os
 from sugar import ErrorSugar
+import SOAPpy
 
 
 # Configuro el logging
@@ -40,7 +41,17 @@ class HandleEvents(pyinotify.ProcessEvent):
                 try:
                     logger.debug("Proceso el archivo " + event.pathname)
 
-                    instancia = modulo.obtener_instancia()
+                    contador = 0
+                    while True:
+                        try:
+                            instancia = modulo.obtener_instancia()
+                        except SOAPpy.wstools.TimeoutSocket.TimeoutError:
+                            contador += 1
+                            if contador > 10:
+                                raise
+                        else:
+                            break
+
                     modulo.procesar(instancia, event.pathname)
                     
                     # Si funciono correctamente, paso por aca. Tengo que borrar
