@@ -20,7 +20,7 @@ def procesar(instancia, pathname):
 
 def procesar_linea(instancia, linea):
 
-    datos = linea.split(',')
+    datos = linea.split(';')
 
     # Para cada usuario a importar, hago una busqueda de Contactos por id_maipu,
     # por si los usuarios fueron ingresados previamente al cargar una venta
