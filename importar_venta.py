@@ -1,3 +1,5 @@
+import sugar
+import crm_config
 import monitor_config
 import logging
 
@@ -6,19 +8,17 @@ import logging
 logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
 logger = logging.getLogger("importar_venta")
 
-def procesar(pathname):
-    import sugar
-    import crm_config
-    
-    # Me conecto a la instancia de SugarCRM.
-    logger.debug("Conectando a instancia")
-    instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
-                    crm_config.CLAVE, ['mm002_Ventas', 'mm002_Marcas',
-                                        'mm002_Modelo', 'mm002_Catalogos',
-                                        'mm002_Tipo_venta', 'mm002_Sucursales',
-                                        'Contacts', 'mm002_Encuestas'],
-                    crm_config.LDAP_KEY, crm_config.LDAP_IV)
+def procesar(instancia, pathname):
 
+    # Leo el archivo de datos.
+    arch_datos = open(pathname)
+    datos = arch_datos.readlines()
+    
+    return procesar_linea(instancia, datos[0])
+
+
+def procesar_linea(instancia, linea):
+    
     # Creo un objeto nuevo del modulo Ventas.
     objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Ventas'])
 
@@ -32,13 +32,18 @@ def procesar(pathname):
             'patenta_maipu']
 
     # Leo el archivo de datos.
-    arch_datos = open(pathname)
-    datos = arch_datos.readlines()
+    datos = linea.split(';')
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
         logger.debug(campo[0] + ' -> ' + campo[1])
-        objeto.importar_campo(campo[0].rstrip(), unicode(campo[1].rstrip()))
+        if campo[0] == 'patenta_maipu' and campo[1] == 'M':
+            objeto.importar_campo(campo[0].rstrip(), '1')
+        elif campo[0] == 'patenta_maipu' and campo[1] != 'M':
+            objeto.importar_campo(campo[0].rstrip(), '0')
+        else:
+            objeto.importar_campo(campo[0].rstrip(), unicode(campo[1].rstrip(),
+                                                            'iso-8859-1'))
 
     logger.debug("Objeto listo.")
 
@@ -143,15 +148,24 @@ def procesar(pathname):
     logger.debug("Grabando una nueva VENTA...")
     logger.debug(objeto.grabar())
 
+    # Relaciono la venta creada con el cliente
+    logger.debug("Relacionando venta con el cliente...")
+    instancia.relacionar(contacto, objeto)
 
     # Agrego una encuesta de satisfaccion
-
     encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
     encuesta.importar_campo('venta_id', operacion_id)
     encuesta.importar_campo('tipo_encuesta', '1')
     encuesta.importar_campo('encuesta_estado', 'No iniciada')
-    encuesta.importar_campo('patenta_maipu',
-                    objeto.obtener_campo('patenta_maipu').a_sugar())
+    encuesta.importar_campo('fecha_facturacion', 
+                        objeto.obtener_campo('fecha_venta').a_sugar())
+
+    if objeto.obtener_campo('patenta_maipu').a_sugar() == 'M':
+        patenta_maipu = '1'
+    else:
+        patenta_maipu = '0'
+    encuesta.importar_campo('patenta_maipu', patenta_maipu)
+
     encuesta.importar_campo('name', operacion_id)
     encuesta.grabar()
 
@@ -161,10 +175,23 @@ def procesar(pathname):
     return True
 
 
+def obtener_instancia():
+    # Me conecto a la instancia de SugarCRM.
+    logger.debug("Conectando a instancia")
+    instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
+                    crm_config.CLAVE, ['mm002_Ventas', 'mm002_Marcas',
+                                        'mm002_Modelo', 'mm002_Catalogos',
+                                        'mm002_Tipo_venta', 'mm002_Sucursales',
+                                        'Contacts', 'mm002_Encuestas'],
+                    crm_config.LDAP_KEY, crm_config.LDAP_IV)
+
+    return instancia
+
+
 if __name__ == '__main__':
     import sys
-    
-    procesar(sys.argv[1])
 
+    instancia = obtener_instancia()
+    procesar(instancia, sys.argv[1])
 
 

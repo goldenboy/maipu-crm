@@ -12,9 +12,11 @@ LOG_LEVEL = 'debug'
 
 PATHS = [   ('/ventas/', 'importar_venta'),
             ('/ventas_batch/', 'importar_venta_batch'),
-            ('/turnos/0', 'importar_turno'),
-            ('/turnos/1', 'importar_turno'),
-            ('/turnos/2', 'importar_turno'),
+            ('/cliente/', 'importar_cliente'),
+            ('/cliente_batch/', 'importar_cliente_batch'),
+            ('/turnos/0', 'importar_turno_nuevo'),
+            ('/turnos/2', 'importar_turno_nuevo'),
+            ('/turnos/4', 'importar_turno_nuevo'),
 ]
 
 

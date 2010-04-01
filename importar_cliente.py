@@ -20,8 +20,17 @@ def procesar(instancia, pathname):
 
 def procesar_linea(instancia, linea):
 
-    # Creo un objeto nuevo del modulo Contacts.
-    objeto = sugar.ObjetoSugar(instancia.modulos['Contacts'])
+    datos = linea.split(',')
+
+    # Para cada usuario a importar, hago una busqueda de Contactos por id_maipu,
+    # por si los usuarios fueron ingresados previamente al cargar una venta
+    busq = instancia.modulos['Contacts'].buscar(id_maipu_c=datos[0])
+    if len(busq) != 0:
+        # si hay algun resultado, uso el primero
+        objeto = busq[0]
+    else:
+        # Creo un objeto nuevo del modulo Contacts.
+        objeto = sugar.ObjetoSugar(instancia.modulos['Contacts'])
 
     # La lista 'campos' tiene los nombres de las columnas ordenadas.
     campos = ['id_maipu_c', 'last_name', 'birthdate', 'primary_address_street', 
@@ -36,7 +45,6 @@ def procesar_linea(instancia, linea):
             'condicion_iva_c', 'salutation', 'empresa_c', 'actividad_c',
             'profesion_c', 'estado_civil_c', 'sexo_c']
     
-    datos = linea.split(',')
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
@@ -61,14 +69,20 @@ def procesar_linea(instancia, linea):
     
     return True
 
-if __name__ == '__main__':
-    import sys
-    
+
+def obtener_instancia():
     # Me conecto a la instancia de SugarCRM.
     logger.debug("Conectando a instancia")
     instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
-                    crm_config.CLAVE, ['Contacts'], crm_config.LDAP_KEY,
-                    crm_config.LDAP_IV)
-    
+                    crm_config.CLAVE, ['Contacts'],
+                    crm_config.LDAP_KEY, crm_config.LDAP_IV)
+
+    return instancia
+
+
+if __name__ == '__main__':
+    import sys
+
+    instancia = obtener_instancia()
     procesar(instancia, sys.argv[1])
 

@@ -41,7 +41,7 @@ class TipoSugar_id(TipoSugar):
 
     def validar(self, valor):
         if type(valor) != types.StringType:
-            raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
+            raise ErrorSugar("id: Tipo incorrecto. Esperaba un string.")
         return True
 
 
@@ -56,7 +56,7 @@ class TipoSugar_datetime(TipoSugar):
             
     def validar(self, valor):
         if type(valor) != type(time.strptime('2009', '%Y')):
-            raise ErrorSugar("Tipo incorrecto. Esperaba un struct_time.")
+            raise ErrorSugar("datetime: Tipo incorrecto. Esperaba un struct_time.")
         return True
     
     def a_sugar(self):
@@ -79,7 +79,7 @@ class TipoSugar_assigned_user_name(TipoSugar):
 
     def validar(self, valor):
         if type(valor) != types.StringType:
-            raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
+            raise ErrorSugar("user_name: Tipo incorrecto. Esperaba un string.")
         return True
 
 
@@ -90,7 +90,7 @@ class TipoSugar_text(TipoSugar):
 
     def validar(self, valor):
         if type(valor) != types.UnicodeType:
-            raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
+            raise ErrorSugar("text: Tipo incorrecto. Esperaba un string.")
         return True
 
 
@@ -104,7 +104,7 @@ class TipoSugar_bool(TipoSugar):
 
     def validar(self, valor):
         if type(valor) != types.BooleanType:
-            raise ErrorSugar("Tipo incorrecto. Esperaba un booleano.")
+            raise ErrorSugar("bool: Tipo incorrecto. Esperaba un booleano.")
         return True
     
     def a_sugar(self):
@@ -127,7 +127,7 @@ class TipoSugar_relate(TipoSugar):
 
     def validar(self, valor):
         if type(valor) != types.StringType:
-            raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
+            raise ErrorSugar("relate: Tipo incorrecto. Esperaba un string.")
         return True
 
 
@@ -148,7 +148,7 @@ class TipoSugar_enum(TipoSugar):
         if valor in self.opciones.keys():
             return True
         else:
-            raise ErrorSugar("Valor de la opcion incorrecto.")
+            raise ErrorSugar("enum: Valor de la opcion incorrecto.")
 
     def de_string(self, valor):
         if valor in self.opciones:
@@ -164,7 +164,7 @@ class TipoSugar_varchar(TipoSugar):
 
     def validar(self, valor):
         if type(valor) != types.UnicodeType:
-            raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
+            raise ErrorSugar("varchar: Tipo incorrecto. Esperaba un string.")
         return True
 
 
@@ -175,7 +175,7 @@ class TipoSugar_phone(TipoSugar):
     
     def validar(self, valor):
         if type(valor) != types.StringType:
-            raise ErrorSugar("Tipo incorrecto. Esperaba un string.")
+            raise ErrorSugar("phone: Tipo incorrecto. Esperaba un string.")
         return True
 
 
@@ -190,7 +190,7 @@ class TipoSugar_date(TipoSugar):
     
     def validar(self, valor):
         if type(valor) != type(time.strptime('2009', '%Y')):
-            raise ErrorSugar("Tipo incorrecto. Esperaba un struct_time.")
+            raise ErrorSugar("date: Tipo incorrecto. Esperaba un struct_time.")
         return True
     
     def a_sugar(self):
@@ -203,7 +203,10 @@ class TipoSugar_date(TipoSugar):
 
     def de_string(self, valor):
         try:
-            valor_nuevo = time.strptime(valor, '%Y-%m-%d')
+            if valor.__contains__('-'):
+                valor_nuevo = time.strptime(valor, '%Y-%m-%d')
+            else:
+                valor_nuevo = time.strptime(valor, '%Y%m%d')
             return valor_nuevo
         except ValueError:
             return None
@@ -219,7 +222,7 @@ class TipoSugar_int(TipoSugar):
         
     def validar(self, valor):
         if type(valor) != types.IntType:
-            raise ErrorSugar("Tipo incorrecto. Esperaba un entero.")
+            raise ErrorSugar("int: Tipo incorrecto. Esperaba un entero.")
         return True
     
     def a_sugar(self):
@@ -230,6 +233,8 @@ class TipoSugar_int(TipoSugar):
 
     def de_string(self, valor):
         try:
+            if valor == '':
+                valor = '0'
             valor_nuevo = int(valor)
             return valor_nuevo
         except ValueError:

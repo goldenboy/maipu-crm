@@ -33,19 +33,21 @@ class HandleEvents(pyinotify.ProcessEvent):
                 # el archivo, pasando su ruta como parametro
                 try:
                     logger.debug("Proceso el archivo " + event.pathname)
-                    modulo.procesar(event.pathname)
+
+                    instancia = modulo.obtener_instancia()
+                    modulo.procesar(instancia, event.pathname)
                     
                     # Si funciono correctamente, paso por aca. Tengo que borrar
                     # el archivo
                     os.remove(event.pathname)
                     break
                     
-                except ErrorSugar:
+                except ErrorSugar as detalle:
                     # Si paso por aca es porque hubo algun problema con la
                     # importacion.
                     
                     # Doy mensaje de error
-                    logger.debug("Error en la importacion")
+                    logger.debug("Error en la importacion. "+ str(detalle))
                     
                     # Muevo el archivo a la carpeta de errores
                     logger.debug(event.pathname)
