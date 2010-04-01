@@ -1,5 +1,13 @@
+import sugar
+import crm_config
 import monitor_config
 import logging
+
+######################
+# Con este script doy de alta un turno nuevo en el sugar, y le indico a los
+# operadores del call que deben llamar al contacto (habra un dashlet en el
+# sugar que presente los turnos del dia siguiente).
+######################
 
 
 # Configuro el logging
@@ -7,36 +15,67 @@ logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
 logger = logging.getLogger("importar_turno")
 
 
-def procesar(pathname):
-    import sugar
-    import crm_config
+def procesar(instancia, pathname):
     
-    # Me conecto a la instancia de SugarCRM.
-    instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
-                    crm_config.CLAVE, ['mm002_Ventas', 'mm002_Marcas',
-                                        'mm002_Modelo', 
-                                        'mm002_Sucursales',
-                                        'Contacts', 'mm002_Encuestas'],
-                    crm_config.LDAP_KEY, crm_config.LDAP_IV)
 
-    # Creo un objeto nuevo del modulo Ventas.
-    objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Ventas'])
-
-    # Defino la plantilla con los campos.
-    campos = ['operacion_id', 'id_maipu_cliente', 'marcas_codigo',
-            'marcas_descripcion', 'modelos_codigo', 'modelos_descripcion',
-            'fecha_venta', 'tipo_venta_codigo', 'tipo_venta_descripcion',
-            'vendedor_codigo', 'vendedor_nombre', 'sucursales_codigo',
-            'sucursales_descripcion', 'gestor_codigo', 'gestor_nombre']
-
-    # Lo mismo con el archivo de datos.
+    # Abro el archivo de datos.
     arch_datos = open(pathname)
     datos = arch_datos.readlines()
 
+    linea = datos[0]
+    datos = linea.split(';')
+
+    # Para cada turno a importar, hago una busqueda de Turnos por turno_id,
+    # por si los turnos fueron ingresados previamente
+    busq = instancia.modulos['mm002_Turnos'].buscar(turno_id=datos[0])
+    if len(busq) != 0:
+        # si hay algun resultado, uso el primero
+        objeto = busq[0]
+    else:
+        # Creo un objeto nuevo del modulo Turnos.
+        objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Turnos'])
+
+    # Defino la plantilla con los campos.
+    campos = ['turno_id', 'nombre_contacto', 'nombre_cliente',
+            'cliente_id', 'orden_id', 'telefono_uno',
+            'telefono_dos', 'dominio', 'fecha_turno',
+            'hora_turno', 'motivo_turno', 'asesor_codigo',
+            'asesor_nombre', 'fecha_entrega', 'hora_entrega', 'estado_turno',
+            'marcas_codigo', 'marcas_descripcion', 'dunno3',
+            'dunno2', 'garantia', 'dunno']
+    # hago copia y quito los elementos que no van al sugar
+    campos_utiles = []
+    for campo in campos:
+        campos_utiles.append(campo)
+#    campos_utiles.remove('nombre_cliente')
+#    campos_utiles.remove('estado_turno')
+    campos_utiles.remove('dunno')
+    campos_utiles.remove('dunno2')
+    campos_utiles.remove('dunno3')
+    campos_utiles.remove('marcas_descripcion')
+
+
     # Cargo todos los valores importados en el objeto que entrara en sugar.
-    for campo in zip(campos, datos):
-        logger.debug(campo[0] + ' -> ' + campo[1])
-        objeto.importar_campo(campo[0].rstrip(), unicode(campo[1].rstrip()))
+    inutiles = zip(campos, datos)
+    utiles = [inutil for inutil in inutiles if inutil[0] in campos_utiles]
+    for campo in utiles:
+        if campo[0] == 'garantia':
+            valor_checkbox = (lambda x: x == 'G')(campo[1])
+            logger.debug(campo[0] + ' -> ' + str(valor_checkbox))
+            objeto.modificar_campo(campo[0].rstrip(), valor_checkbox)
+        elif (campo[0] == 'fecha_entrega' or campo[0] == 'fecha_turno') and \
+                                    campo[1] == '00000000':
+            # No importo este campo, lo dejo en blanco
+            pass
+        else:
+            logger.debug(campo[0] + ' -> ' + unicode(campo[1].rstrip(),
+                                                              'iso-8859-1'))
+            objeto.importar_campo(campo[0].rstrip(), unicode(campo[1].rstrip(),
+                                                              'iso-8859-1'))
+
+    # Indico que el operador del call debe llamar al "contacto"
+    #  0 es "Sin contacto"
+    objeto.importar_campo('estado_contacto', '0')
 
     logger.debug("Objeto listo.")
 
@@ -44,95 +83,73 @@ def procesar(pathname):
     # existan en Sugar y sean unicos. En caso de que no existan, los creo. Y si no
     # son unicos, salgo emitiendo un error.
 
-    # Primero, verifico que exista el cliente.
-    valor = objeto.obtener_campo('id_maipu_cliente').a_sugar()
+    # Primero, verifico que exista el cliente. Si no existe, lo creo
+    logger.debug("Buscando cliente.")
+    valor = objeto.obtener_campo('cliente_id').a_sugar()
     res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
-    if len(res) != 1:
-        raise sugar.ErrorSugar('No existe un solo cliente con ese ID')
-    # Guardo el ID de sugar para mas tarde
-    contacto = res[0]
+    if len(res) == 0:
+        # No hay un cliente con ese id. Lo creo
+        logger.debug("No hay cliente cargado.")
+        contacto = sugar.ObjetoSugar(instancia.modulos['Contacts'])
+        contacto.importar_campo('last_name', unicode(datos[2], 'iso-8859-1'))
+        contacto.importar_campo('phone_home', datos[5])
+        contacto.importar_campo('phone_other', datos[6])
+        contacto.importar_campo('id_maipu_c', datos[3])
+        logger.debug("Grabando cliente.")
+        contacto.grabar()
+    else:
+        logger.debug("Existe el cliente.")
+        # Hay uno o mas. Elijo el primero
+        contacto = res[0]
+
     contact_id = contacto.obtener_campo('id').a_sugar()
-
-
-    # Luego veo que la marca este cargada, y si no lo esta, la agrego.
-    valor = objeto.obtener_campo('marcas_codigo').a_sugar()
-    res = instancia.modulos['mm002_Marcas'].buscar(marcas_codigo=valor)
-    if len(res) > 1:
-        raise sugar.ErrorSugar('Hay marcas con ID duplicado')
-    elif len(res) == 0:
-        # Debo crear un objeto marca nuevo y agregarlo.
-        obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Marcas'])
-        obj_nuevo.importar_campo('marcas_codigo', valor)
-        obj_nuevo.importar_campo('marcas_descripcion',
-                        objeto.obtener_campo('marcas_descripcion').a_sugar())
-        logger.debug("Grabando una nueva Marca...")
-        obj_nuevo.grabar()
-
-
-    # Luego hago lo mismo con el modelo
-    valor_marca = valor
-    valor = objeto.obtener_campo('modelos_codigo').a_sugar()
-    res = instancia.modulos['mm002_Modelo'].buscar(modelos_codigo=valor, marcas_codigo=valor_marca)
-    if len(res) > 1:
-        raise sugar.ErrorSugar('Hay modelos con ID duplicado')
-    elif len(res) == 0:
-        # Debo crear un objeto modelo nuevo y agregarlo.
-        obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Modelo'])
-        obj_nuevo.importar_campo('modelos_codigo', valor)
-        obj_nuevo.importar_campo('modelos_descripcion',
-                        objeto.obtener_campo('modelos_descripcion').a_sugar())
-        obj_nuevo.importar_campo('marcas_codigo',
-                        objeto.obtener_campo('marcas_codigo').a_sugar())
-        logger.debug("Grabando un nuevo Modelo...")
-        obj_nuevo.grabar()
-
-
-    # Por ultimo veo que la sucursal este cargada, y si no lo esta, la agrego.
-    valor = objeto.obtener_campo('sucursales_codigo').a_sugar()
-    res = instancia.modulos['mm002_Sucursales'].buscar(sucursales_codigo=valor)
-    if len(res) > 1:
-        raise sugar.ErrorSugar('Hay sucursales con ID duplicado')
-    elif len(res) == 0:
-        # Debo crear un objeto sucursal nuevo y agregarlo.
-        obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Sucursales'])
-        obj_nuevo.importar_campo('sucursales_codigo', valor)
-        obj_nuevo.importar_campo('sucursales_descripcion',
-                    objeto.obtener_campo('sucursales_descripcion').a_sugar())
-        logger.debug("Grabando una nueva sucursal...")
-        obj_nuevo.grabar()
-
-
-    # Voy a darle un valor al campo 'name', utilizando el ID de la operacion
-    operacion_id = objeto.obtener_campo('operacion_id').a_sugar()
-    objeto.importar_campo('name', operacion_id)
+    
+    # Voy a darle un valor al campo 'name', utilizando el ID del turno
+    logger.debug("Dando nombre al turno.")
+    operacion_id = objeto.obtener_campo('turno_id').a_sugar()
+    objeto.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
 
 
 
     # Aqui ya estan creadas todas las entradas en Sugar de las cuales esta venta
     # depende. Ya puedo agrear la venta a la base de datos.
 
-    logger.debug("Grabando una nueva VENTA...")
+    logger.debug("Grabando un nuevo TURNO...")
     logger.debug(objeto.grabar())
 
+    
+#    logger.debug(pathname)
+    if pathname.split('/')[-1][0] == '4':
+        # Orden facturada. Agrego una encuesta de satisfaccion
+        encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
+        encuesta.importar_campo('turno_id', operacion_id)
+        encuesta.importar_campo('tipo_encuesta', '0')
+        encuesta.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
+        logger.debug("Grabando una nueva ENCUESTA...")
+        encuesta.grabar()
 
-    # Agrego una encuesta de satisfaccion
+        # Relaciono la encuesta creada con el cliente
+        instancia.relacionar(contacto, encuesta)
 
-    encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
-    encuesta.importar_campo('venta_id', operacion_id)
-    encuesta.importar_campo('tipo_encuesta', '1')
-    encuesta.importar_campo('name', operacion_id)
-    encuesta.grabar()
-
-    # Relaciono la encuesta creada con el cliente
-    instancia.relacionar(contacto, encuesta)
+    # Relaciono el turno tambien con el cliente, para que quede en su historia
+    instancia.relacionar(contacto, objeto)
     
     return True
 
 
+def obtener_instancia():
+    # Me conecto a la instancia de SugarCRM.
+    instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
+                    crm_config.CLAVE, ['mm002_Turnos', 'mm002_Marcas',
+                                        'mm002_Modelo', 'mm002_Encuestas',
+                                        'Contacts'],
+                    crm_config.LDAP_KEY, crm_config.LDAP_IV)
+
+    return instancia
+
 if __name__ == '__main__':
     import sys
-    
-    procesar(sys.argv[1])
 
-
+    instancia = obtener_instancia()
+    procesar(instancia, sys.argv[1])
 
