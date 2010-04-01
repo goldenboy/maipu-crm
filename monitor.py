@@ -39,6 +39,7 @@ class HandleEvents(pyinotify.ProcessEvent):
                     
                     # Si funciono correctamente, paso por aca. Tengo que borrar
                     # el archivo
+                    logger.debug("Borro el archivo " + event.pathname)
                     os.remove(event.pathname)
                     break
                     
@@ -55,6 +56,7 @@ class HandleEvents(pyinotify.ProcessEvent):
                                 event.pathname[len(monitor_config.DIR_BASE):])
                     os.rename(event.pathname, monitor_config.DIR_ERR +
                                 event.pathname[len(monitor_config.DIR_BASE):])
+                    logger.debug("Archivo movido (por error)")
                     break
                 
         else:
@@ -67,6 +69,7 @@ class HandleEvents(pyinotify.ProcessEvent):
                             event.pathname[len(monitor_config.DIR_BASE):])
             os.rename(event.pathname, monitor_config.DIR_ERR +
                                 event.pathname[len(monitor_config.DIR_BASE):])
+            logger.debug("Archivo movido (por patron no coincidente)")
 
     def process_default(self, event):
         # Para el resto de los eventos no quiero que pase nada.
