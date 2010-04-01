@@ -124,6 +124,7 @@ def procesar(instancia, pathname):
         encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
         encuesta.importar_campo('turno_id', operacion_id)
         encuesta.importar_campo('tipo_encuesta', '0')
+        encuesta.importar_campo('encuesta_estado', 'No iniciada')
         encuesta.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
         logger.debug("Grabando una nueva ENCUESTA...")
         encuesta.grabar()

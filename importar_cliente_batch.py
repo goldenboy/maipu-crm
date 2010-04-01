@@ -32,7 +32,7 @@ def procesar(instancia, pathname):
         if(not ret):
             # Si hubo un error al procesar la linea del archivo
             if(not hubo_errores):
-                errores = open(monitor_config.DIR_ERR + '/cliente_batch_' +\
+                errores = open(monitor_config.DIR_ERR + '/cliente_batch/' +\
                                 err_filename, 'w')
             errores.write(linea)
             errores.flush()
@@ -45,17 +45,12 @@ def procesar(instancia, pathname):
     
     return True
 
+obtener_instancia = importar_cliente.obtener_instancia
 
 if __name__ == '__main__':
     import sys
 
-    # Me conecto a la instancia de SugarCRM.
-    logger.debug("Conectando a instancia")
-    instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
-                    crm_config.CLAVE, ['Contacts'], crm_config.LDAP_KEY,
-                    crm_config.LDAP_IV)
-
+    instancia = obtener_instancia()
     procesar(instancia, sys.argv[1])
-
 
 
