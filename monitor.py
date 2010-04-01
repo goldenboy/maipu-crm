@@ -16,6 +16,12 @@ mask = pyinotify.IN_CLOSE_WRITE  # watched events
 class HandleEvents(pyinotify.ProcessEvent):
     def process_IN_CLOSE_WRITE(self, event):
         logger.debug("Ingreso al manejador del evento")
+
+        try:
+            os.stat(event.pathname)
+        except OSError:
+            logger.debug("El archivo ya no existe")
+            return
         
         # Primero identifico el codigo que debo llamar. Para eso recorro la
         # lista monitor_config.PATHS hasta encontrar un patron coincidente.
