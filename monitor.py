@@ -42,7 +42,7 @@ class HandleEvents(pyinotify.ProcessEvent):
                     os.remove(event.pathname)
                     break
                     
-                except ErrorSugar as detalle:
+                except ErrorSugar, detalle:
                     # Si paso por aca es porque hubo algun problema con la
                     # importacion.
                     
