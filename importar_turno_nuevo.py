@@ -73,9 +73,17 @@ def procesar(instancia, pathname):
             objeto.importar_campo(campo[0].rstrip(), unicode(campo[1].rstrip(),
                                                               'iso-8859-1'))
 
-    # Indico que el operador del call debe llamar al "contacto"
+    # Si el turno es en mas de 72hs, y estoy dando de alta el turno,
+    # indico que el operador del call debe llamar al "contacto"
     #  0 es "Sin contacto"
-    objeto.importar_campo('estado_contacto', '0')
+    #  1 es "Contacto fallido"
+    #  2 es "Contactado satisfactoriamente"
+    if pathname.split('/')[-1][0] == '0' and \
+        objeto.obtener_campo('fecha_turno') >= (datetime.datetime.now() +
+                                        datetime.timedelta(days=2)).timetuple():
+        objeto.importar_campo('estado_contacto', '0')
+    else:
+        objeto.importar_campo('estado_contacto', '2')
 
     logger.debug("Objeto listo.")
 
