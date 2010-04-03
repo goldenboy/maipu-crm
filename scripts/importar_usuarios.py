@@ -12,15 +12,23 @@ instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
 columnas = ['description', 'last_name', 'user_name', 'title']
 
 # Leo el archivo de datos.
-arch_datos = open('Personal2.csv')
+arch_datos = open('../datos/ListadelCall.csv')
 datos = arch_datos.readlines()
 
 
 for linea in datos:
-    campos = [cadena.strip() for cadena in linea.split(',')]
-    
-    # Creo un objeto nuevo del modulo Users.
-    objeto = sugar.ObjetoSugar(instancia.modulos['Users'])
+    campos = [cadena.strip() for cadena in linea.split(';')]
+
+    # Para cada usuario a importar, hago una busqueda de Usuarios por user_name,
+    # por si los usuarios fueron ingresados previamente
+    busq = instancia.modulos['Users'].buscar(user_name=datos[2])
+    if len(busq) != 0:
+        # si hay algun resultado, uso el primero
+        objeto = busq[0]
+    else:
+        # Creo un objeto nuevo del modulo Users.
+        objeto = sugar.ObjetoSugar(instancia.modulos['Users'])
+
     for i in range(len(columnas)):
         print columnas[i] + ': ' + campos[i]
         try:
