@@ -90,7 +90,7 @@ def procesar(instancia, pathname):
 
     # Verifico que todos los objetos externos referenciados (marca, modelo, etc...)
     # existan en Sugar y sean unicos. En caso de que no existan, los creo. Y si no
-    # son unicos, salgo emitiendo un error.
+    # son unicos, uso el primero?.
 
     # Primero, verifico que exista el cliente. Si no existe, lo creo
     logger.debug("Buscando cliente.")
@@ -108,7 +108,7 @@ def procesar(instancia, pathname):
         logger.debug("Grabando cliente.")
         contacto.grabar()
     else:
-        logger.debug("Existe el cliente.")
+        logger.debug("Existen %i copias del cliente." % len(res))
         # Hay uno o mas. Elijo el primero
         contacto = res[0]
 
