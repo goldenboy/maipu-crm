@@ -51,7 +51,7 @@ def procesar_linea(instancia, linea):
         logger.debug(campo[0] + ' -> ' + campo[1])
         try:
             objeto.importar_campo(campo[0].rstrip(), unicode(campo[1].rstrip(),
-                                                        'iso-8859.1'))
+                                                        'iso-8859-1'))
         except sugar.ErrorSugar:
             try:
                 objeto.importar_campo(campo[0].rstrip(), campo[1].rstrip())
