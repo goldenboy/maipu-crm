@@ -81,6 +81,8 @@ def procesar_linea(instancia, linea):
         # Debo crear un objeto marca nuevo y agregarlo.
         obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Marcas'])
         obj_nuevo.importar_campo('marcas_codigo', valor)
+        obj_nuevo.importar_campo('name',
+                        objeto.obtener_campo('marcas_descripcion').a_sugar())
         obj_nuevo.importar_campo('marcas_descripcion',
                         objeto.obtener_campo('marcas_descripcion').a_sugar())
         logger.debug("Grabando una nueva Marca...")
@@ -98,6 +100,8 @@ def procesar_linea(instancia, linea):
         obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Modelo'])
         obj_nuevo.importar_campo('modelos_codigo', valor)
         obj_nuevo.importar_campo('modelos_descripcion',
+                        objeto.obtener_campo('modelos_descripcion').a_sugar())
+        obj_nuevo.importar_campo('name',
                         objeto.obtener_campo('modelos_descripcion').a_sugar())
         obj_nuevo.importar_campo('marcas_codigo',
                         objeto.obtener_campo('marcas_codigo').a_sugar())
@@ -118,7 +122,26 @@ def procesar_linea(instancia, linea):
         obj_nuevo.importar_campo('catalogos_codigo', valor)
         obj_nuevo.importar_campo('catalogos_descripcion',
                         objeto.obtener_campo('catalogos_descripcion').a_sugar())
+        obj_nuevo.importar_campo('name',
+                        objeto.obtener_campo('catalogos_descripcion').a_sugar())
         logger.debug("Grabando un nuevo Catalogo...")
+        obj_nuevo.grabar()
+
+
+    # Veo que el tipo de venta este cargado, y si no lo esta, lo agrego.
+    valor = objeto.obtener_campo('tipo_venta_codigo').a_sugar()
+    res = instancia.modulos['mm002_Tipo_venta'].buscar(tipo_venta_codigo=valor)
+    if len(res) > 1:
+        raise sugar.ErrorSugar('Hay tipos de venta con ID duplicado')
+    elif len(res) == 0:
+        # Debo crear un objeto tipo_venta nuevo y agregarlo.
+        obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Tipo_venta'])
+        obj_nuevo.importar_campo('tipo_venta_codigo', valor)
+        obj_nuevo.importar_campo('name',
+                    objeto.obtener_campo('tipo_venta_descripcion').a_sugar())
+        obj_nuevo.importar_campo('tipo_venta_descripcion',
+                    objeto.obtener_campo('tipo_venta_descripcion').a_sugar())
+        logger.debug("Grabando un nuevo tipo_venta...")
         obj_nuevo.grabar()
 
 
@@ -131,6 +154,8 @@ def procesar_linea(instancia, linea):
         # Debo crear un objeto sucursal nuevo y agregarlo.
         obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Sucursales'])
         obj_nuevo.importar_campo('sucursales_codigo', valor)
+        obj_nuevo.importar_campo('name',
+                    objeto.obtener_campo('sucursales_descripcion').a_sugar())
         obj_nuevo.importar_campo('sucursales_descripcion',
                     objeto.obtener_campo('sucursales_descripcion').a_sugar())
         logger.debug("Grabando una nueva sucursal...")
@@ -155,6 +180,7 @@ def procesar_linea(instancia, linea):
     # Agrego una encuesta de satisfaccion
     encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
     encuesta.importar_campo('venta_id', operacion_id)
+    encuesta.importar_campo('name', 'Encuesta de venta %i' % operacion_id)
     encuesta.importar_campo('tipo_encuesta', '1')
     encuesta.importar_campo('encuesta_estado', 'No iniciada')
     encuesta.importar_campo('fecha_facturacion', 
