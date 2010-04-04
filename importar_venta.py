@@ -180,7 +180,7 @@ def procesar_linea(instancia, linea):
     # Agrego una encuesta de satisfaccion
     encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
     encuesta.importar_campo('venta_id', operacion_id)
-    encuesta.importar_campo('name', 'Encuesta de venta %i' % operacion_id)
+    encuesta.importar_campo('name', 'Encuesta de venta %s' % operacion_id)
     encuesta.importar_campo('tipo_encuesta', '1')
     encuesta.importar_campo('encuesta_estado', 'No iniciada')
     encuesta.importar_campo('fecha_facturacion', 
