@@ -25,8 +25,8 @@ def procesar(instancia, pathname):
     for linea in datos:
         try:
             ret = importar_venta.procesar_linea(instancia, linea)
-        except ErrorSugar:
-            logger.error("Hubo error de tipo ErrorSugar")
+        except sugar.ErrorSugar, descripcion:
+            logger.error("Hubo error de tipo ErrorSugar: %s", str(descripcion))
             ret = False
         except ValueError:
             ret = False
