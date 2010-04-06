@@ -136,6 +136,13 @@ def procesar(instancia, pathname):
         encuesta.importar_campo('tipo_encuesta', '0')
         encuesta.importar_campo('encuesta_estado', 'No iniciada')
         encuesta.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
+
+        # Defino la fecha tentativa de encuesta
+        
+        hoy = datetime.datetime.today()
+        encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
+                                    datetime.timedelta(days=7)).timetuple())
+        
         logger.debug("Grabando una nueva ENCUESTA...")
         encuesta.grabar()
 
