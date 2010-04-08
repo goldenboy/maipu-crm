@@ -21,7 +21,13 @@ def procesar(instancia, pathname):
 def procesar_linea(instancia, linea):
     
     # Creo un objeto nuevo del modulo Ventas.
-    objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Ventas'])
+    busq = instancia.modulos['mm002_Ventas'].buscar(operacion_id=datos[0])
+    if len(busq) != 0:
+        # si hay algun resultado, uso el primero
+        objeto = busq[0]
+    else:
+        # Creo un objeto nuevo del modulo Ventas.
+        objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Ventas'])
 
     # Defino la plantilla con los campos.
     campos = ['operacion_id', 'id_maipu_cliente', 'nombre_cliente', 'marcas_codigo',
