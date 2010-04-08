@@ -201,8 +201,13 @@ def procesar_linea(instancia, linea):
         delta = 15
 
     logger.debug("Antes de tocar encuesta")
+
+    if datos[10] == '1' or datos[10] == '4':
+        tipo_venta_enc = 1
+    elif:
+        tipo_venta_enc = datos[10]
     
-    encuesta.importar_campo('tipo_encuesta', unicode(datos[10], 'iso-8859-1'))
+    encuesta.importar_campo('tipo_encuesta', unicode(tipo_venta_enc, 'iso-8859-1'))
     encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
                                     datetime.timedelta(days=delta)).timetuple())
     
