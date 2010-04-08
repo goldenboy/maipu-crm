@@ -177,7 +177,8 @@ def procesar_linea(instancia, linea):
     # Relaciono la venta creada con el cliente
     logger.debug("Relacionando venta con el cliente...")
     instancia.relacionar(contacto, objeto)
-
+    logger.debug("Pase relacionar")
+    
     # Agrego una encuesta de satisfaccion
     encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
     encuesta.importar_campo('venta_id', operacion_id)
@@ -193,6 +194,8 @@ def procesar_linea(instancia, linea):
         # Sino, debe ser venta especial o planes
         delta = 15
 
+    logger.debug("Antes de tocar encuesta")
+    
     encuesta.importar_campo('tipo_encuesta', unicode(datos[10], 'iso-8859-1'))
     encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
                                     datetime.timedelta(days=delta)).timetuple())
@@ -208,6 +211,7 @@ def procesar_linea(instancia, linea):
     encuesta.importar_campo('patenta_maipu', patenta_maipu)
 
     encuesta.importar_campo('name', operacion_id)
+    logger.debug("Grabando una nueva ENCUESTA...")
     encuesta.grabar()
 
     # Relaciono la encuesta creada con el cliente
