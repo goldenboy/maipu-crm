@@ -45,11 +45,11 @@ def procesar_linea(instancia, linea):
     for campo in zip(campos, datos):
         logger.debug(campo[0] + ' -> ' + campo[1])
         if campo[0] == 'patenta_maipu' and campo[1] == 'M':
-            objeto.importar_campo(campo[0].rstrip(), '1')
+            objeto.importar_campo(campo[0], '1')
         elif campo[0] == 'patenta_maipu' and campo[1] != 'M':
-            objeto.importar_campo(campo[0].rstrip(), '0')
+            objeto.importar_campo(campo[0], '0')
         else:
-            objeto.importar_campo(campo[0].rstrip(), unicode(campo[1].rstrip(),
+            objeto.importar_campo(campo[0], unicode(campo[1].rstrip(),
                                                             'iso-8859-1'))
 
     logger.debug("Objeto listo.")
@@ -186,7 +186,14 @@ def procesar_linea(instancia, linea):
     logger.debug("Pase relacionar")
     
     # Agrego una encuesta de satisfaccion
-    encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
+    busq = instancia.modulos['mm002_Encuestas'].buscar(venta_id=operacion_id)
+    if len(busq) != 0:
+        # si hay algun resultado, uso el primero
+        encuesta = busq[0]
+    else:
+        # Creo un objeto nuevo del modulo mm002_Encuestas.
+        encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
+
     encuesta.importar_campo('venta_id', operacion_id)
     encuesta.importar_campo('name', 'Encuesta de venta %s' % operacion_id)
 
@@ -217,12 +224,8 @@ def procesar_linea(instancia, linea):
     encuesta.importar_campo('encuesta_estado', 'No iniciada')
     encuesta.importar_campo('fecha_facturacion', 
                         objeto.obtener_campo('fecha_venta').a_sugar())
-
-    if objeto.obtener_campo('patenta_maipu').a_sugar() == 'M':
-        patenta_maipu = '1'
-    else:
-        patenta_maipu = '0'
-    encuesta.importar_campo('patenta_maipu', patenta_maipu)
+    
+    encuesta.importar_campo('patenta_maipu', objeto.obtener_campo('patenta_maipu').a_sugar())
 
     encuesta.importar_campo('name', operacion_id)
     logger.debug("Grabando una nueva ENCUESTA...")
