@@ -203,9 +203,12 @@ def procesar_linea(instancia, linea):
     logger.debug("Antes de tocar encuesta")
 
     if datos[10] == '1' or datos[10] == '4':
-        tipo_venta_enc = 1
-    elif:
-        tipo_venta_enc = datos[10]
+        tipo_venta_enc = '1'
+    elif datos[10] == '3':
+        tipo_venta_enc = '2'
+    else:
+        logger.error("Tipo de venta no soportado")
+        raise sugar.ErrorSugar("Tipo de venta codigo no soportado")
     
     encuesta.importar_campo('tipo_encuesta', unicode(tipo_venta_enc, 'iso-8859-1'))
     encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
