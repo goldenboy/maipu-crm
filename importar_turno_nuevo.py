@@ -143,7 +143,7 @@ def procesar(instancia, pathname):
         encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
                                     datetime.timedelta(days=7)).timetuple())
         
-        encuesta.importar_campo('fecha_facturacion', hoy.timetuple())
+        encuesta.modificar_campo('fecha_facturacion', hoy.timetuple())
 
         logger.debug("Grabando una nueva ENCUESTA...")
         encuesta.grabar()
