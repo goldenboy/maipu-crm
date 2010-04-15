@@ -43,7 +43,7 @@ def procesar_linea(instancia, linea):
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
-        logger.debug(campo[0] + ' -> ' + campo[1])
+        logger.debug(campo[0] + ' -> ' + unicode(campo[1], 'iso-8859-1'))
         if campo[0] == 'patenta_maipu' and campo[1] == 'M':
             objeto.importar_campo(campo[0], '1')
         elif campo[0] == 'patenta_maipu' and campo[1] != 'M':

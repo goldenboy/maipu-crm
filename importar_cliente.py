@@ -48,7 +48,7 @@ def procesar_linea(instancia, linea):
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
-        logger.debug(campo[0] + ' -> ' + campo[1])
+        logger.debug(campo[0] + ' -> ' + unicode(campo[1], 'iso-8859-1'))
         try:
             objeto.importar_campo(campo[0].rstrip(), unicode(campo[1].rstrip(),
                                                         'iso-8859-1'))
@@ -57,7 +57,7 @@ def procesar_linea(instancia, linea):
                 objeto.importar_campo(campo[0].rstrip(), campo[1].rstrip())
             except sugar.ErrorSugar:
                 logger.error("No se puede importar el campo "+campo[0]+ ", con "+\
-                        "valor "+campo[1]+".")
+                        "valor "+unicode(campo[1], 'iso-8859-1')+".")
 
     logger.debug("Objeto listo.")
     try:
