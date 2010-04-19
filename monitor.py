@@ -75,8 +75,11 @@ def main_loop():
                         logger.debug(monitor_config.DIR_ERR +
                                     event.pathname[len(monitor_config.DIR_BASE):])
                         logger.debug("Creo hardlink")
-                        os.link(event.pathname, monitor_config.DIR_ERR +
+                        try:
+                            os.link(event.pathname, monitor_config.DIR_ERR +
                                     event.pathname[len(monitor_config.DIR_BASE):])
+                        except OSError:
+                            logger.debug("El archivo ya existia")
                         logger.debug("Borro original")
                         os.remove(event.pathname)
                         logger.debug("Archivo movido (por error)")
@@ -91,8 +94,11 @@ def main_loop():
                 logger.debug(monitor_config.DIR_ERR +
                                 event.pathname[len(monitor_config.DIR_BASE):])
                 logger.debug("Creo hardlink")
-                os.link(event.pathname, monitor_config.DIR_ERR +
+                try:
+                    os.link(event.pathname, monitor_config.DIR_ERR +
                                     event.pathname[len(monitor_config.DIR_BASE):])
+                except OSError:
+                    logger.debug("El archivo ya existia")
                 logger.debug("Borro original")
                 os.remove(event.pathname)
                 logger.debug("Archivo movido (por patron no coincidente)")
