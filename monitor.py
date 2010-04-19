@@ -1,18 +1,5 @@
 
 
-import signal
-def handler(signum, frame):
-    if signum == 13:
-        logger.info("SIGTERM recibida. Terminando de procesar archivos y saliendo")
-        senial_term = True
-        wm.rm_watch(wdd.values())
-        notifier.stop()
-
-def chequear_fin(notifier):
-    if senial_term == True:
-        return True
-    
-
 def main_loop():
     import pyinotify
     import monitor_config
@@ -123,14 +110,12 @@ def main_loop():
     notifier = pyinotify.Notifier(wm, HandleEvents())
 
     wdd = wm.add_watch(monitor_config.DIR_BASE, mask, rec=True)
-    signal.signal(signal.SIGTERM, handler)
     try:
-        notifier.loop(callback=chequear_fin)
+        notifier.loop()
     except KeyboardInterrupt:
         logger.info("Interrumpido")
-    
-    wm.rm_watch(wdd.values())
-    notifier.stop()
+        wm.rm_watch(wdd.values())
+        notifier.stop()
     
 
 if __name__ == '__main__':
