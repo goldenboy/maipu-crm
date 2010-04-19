@@ -74,8 +74,11 @@ def main_loop():
                         logger.debug(event.pathname)
                         logger.debug(monitor_config.DIR_ERR +
                                     event.pathname[len(monitor_config.DIR_BASE):])
-                        os.rename(event.pathname, monitor_config.DIR_ERR +
+                        logger.debug("Creo hardlink")
+                        os.link(event.pathname, monitor_config.DIR_ERR +
                                     event.pathname[len(monitor_config.DIR_BASE):])
+                        logger.debug("Borro original")
+                        os.remove(event.pathname)
                         logger.debug("Archivo movido (por error)")
                         break
                     
@@ -87,8 +90,11 @@ def main_loop():
                 logger.debug(event.pathname)
                 logger.debug(monitor_config.DIR_ERR +
                                 event.pathname[len(monitor_config.DIR_BASE):])
-                os.rename(event.pathname, monitor_config.DIR_ERR +
+                logger.debug("Creo hardlink")
+                os.link(event.pathname, monitor_config.DIR_ERR +
                                     event.pathname[len(monitor_config.DIR_BASE):])
+                logger.debug("Borro original")
+                os.remove(event.pathname)
                 logger.debug("Archivo movido (por patron no coincidente)")
 
         def process_default(self, event):
