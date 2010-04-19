@@ -1,5 +1,14 @@
 
 
+import signal
+def handler(signum, frame):
+    if signum == 13:
+        logger.info("SIGTERM recibida. Terminando de procesar archivos y saliendo")
+        senial_term = True
+        wm.rm_watch(wdd.values())
+        notifier.stop()
+
+
 def main_loop():
     import pyinotify
     import monitor_config
