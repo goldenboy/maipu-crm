@@ -119,6 +119,7 @@ def main_loop():
     notifier = pyinotify.Notifier(wm, HandleEvents())
 
     wdd = wm.add_watch(monitor_config.DIR_BASE, mask, rec=True)
+    signal.signal(signal.SIGTERM, handler)
     try:
         notifier.loop()
     except KeyboardInterrupt:
