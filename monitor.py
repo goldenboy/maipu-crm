@@ -8,6 +8,10 @@ def handler(signum, frame):
         wm.rm_watch(wdd.values())
         notifier.stop()
 
+def chequear_fin(notifier):
+    if senial_term == True:
+        return True
+    
 
 def main_loop():
     import pyinotify
@@ -121,10 +125,12 @@ def main_loop():
     wdd = wm.add_watch(monitor_config.DIR_BASE, mask, rec=True)
     signal.signal(signal.SIGTERM, handler)
     try:
-        notifier.loop()
+        notifier.loop(callback=chequear_fin)
     except KeyboardInterrupt:
-        wm.rm_watch(wdd.values())
-        notifier.stop()
+        logger.info("Interrumpido")
+    
+    wm.rm_watch(wdd.values())
+    notifier.stop()
     
 
 if __name__ == '__main__':
