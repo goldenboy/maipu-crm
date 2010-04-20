@@ -80,7 +80,7 @@ def procesar(instancia, pathname):
     #  1 es "Contacto fallido"
     #  2 es "Contactado satisfactoriamente"
     if pathname.split('/')[-1][0] == '0' and \
-        objeto.obtener_campo('fecha_turno') >= (datetime.datetime.now() +
+        objeto.obtener_campo('fecha_turno').valor >= (datetime.datetime.now() +
                                         datetime.timedelta(days=2)).timetuple():
         objeto.importar_campo('estado_contacto', '0')
     else:
