@@ -184,6 +184,13 @@ def procesar_linea(instancia, linea):
     logger.debug("Relacionando venta con el cliente...")
     instancia.relacionar(contacto, objeto)
     logger.debug("Pase relacionar")
+
+    # No grabar la encuesta si la venta es anterior al 1/5/2010
+    if objeto.obtener_campo('fecha_venta').valor <=
+            datetime.datetime(2010, 05, 01).timetuple():
+        logger.debug("No creo la encuesta por ser la venta muy antigua")
+        return True
+
     
     # Agrego una encuesta de satisfaccion
     busq = instancia.modulos['mm002_Encuestas'].buscar(venta_id=operacion_id)
