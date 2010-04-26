@@ -241,8 +241,8 @@ if __name__ == '__main__':
         
         llamada.grabar()
 
-        logger.debug("Anulo turno en el CRM. Le pongo estado_turno=0000")
-        turno.importar_campo('estado_turno', '0000')
+        logger.debug("Anulo turno en el CRM. Le pongo estado_turno=9999")
+        turno.importar_campo('estado_turno', '9999')
         turno.grabar()
 
         print llamada.obtener_campo('id').a_sugar()
