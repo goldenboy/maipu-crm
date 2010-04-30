@@ -245,6 +245,4 @@ if __name__ == '__main__':
         turno.importar_campo('estado_turno', '9999')
         turno.grabar()
 
-        print llamada.obtener_campo('id').a_sugar()
-
 
