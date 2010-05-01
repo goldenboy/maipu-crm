@@ -62,14 +62,11 @@ def main_loop():
                         logger.debug("Exito. Muevo el archivo " + event.pathname)
                         logger.debug(monitor_config.DIR_EXITO +
                                     event.pathname[len(monitor_config.DIR_BASE):])
-                        logger.debug("Creo hardlink")
                         try:
-                            os.link(event.pathname, monitor_config.DIR_EXITO +
+                            os.rename(event.pathname, monitor_config.DIR_EXITO +
                                     event.pathname[len(monitor_config.DIR_BASE):])
                         except OSError:
-                            logger.debug("El archivo ya existia")
-                        logger.debug("Borro original")
-                        os.remove(event.pathname)
+                            logger.debug("Algun error ocurrio al renombrar")
                         logger.debug("Archivo movido (por exito)")
                         break
                     
