@@ -57,10 +57,20 @@ def main_loop():
 
                         modulo.procesar(instancia, event.pathname)
                     
-                        # Si funciono correctamente, paso por aca. Tengo que borrar
-                        # el archivo
-                        logger.debug("Borro el archivo " + event.pathname)
+                        # Si funciono correctamente, paso por aca.
+                        # Muevo el archivo a la carpeta de exito
+                        logger.debug("Exito. Muevo el archivo " + event.pathname)
+                        logger.debug(monitor_config.DIR_EXITO +
+                                    event.pathname[len(monitor_config.DIR_BASE):])
+                        logger.debug("Creo hardlink")
+                        try:
+                            os.link(event.pathname, monitor_config.DIR_EXITO +
+                                    event.pathname[len(monitor_config.DIR_BASE):])
+                        except OSError:
+                            logger.debug("El archivo ya existia")
+                        logger.debug("Borro original")
                         os.remove(event.pathname)
+                        logger.debug("Archivo movido (por exito)")
                         break
                     
                     except ErrorSugar, detalle:

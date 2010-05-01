@@ -3,6 +3,7 @@
 
 DIR_BASE = '/srv/CRM/procesar'
 DIR_ERR = '/srv/CRM/error'
+DIR_EXITO = '/srv/CRM/exito'
 PLUGIN_DIRS = ['./']
 LOG_LEVEL = 'debug'
 
