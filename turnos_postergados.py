@@ -8,6 +8,9 @@ import logging
 # que no se hayan cumplido, por ausencia del vehiculo
 ######################
 
+# A quien le asigno la llamada
+usuario_asignado_n = 'eamuchastegui'
+usuario_asignado_id = '4df5932a-1f1f-c9e9-402d-4bd1a040dbed'
 
 # Configuro el logging
 logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
@@ -228,6 +231,8 @@ if __name__ == '__main__':
         llamada = sugar.ObjetoSugar(instancia.modulos['Calls'])
 
         llamada.importar_campo('status', 'Planned')
+        llamada.importar_campo('assigned_user_name', usuario_asignado_n)
+        llamada.importar_campo('assigned_user_id', usuario_asignado_id)
         llamada.importar_campo('direction', 'Outbound')
         llamada.importar_campo('parent_type', u'Contacts')
         llamada.importar_campo('parent_id', contact_id)
