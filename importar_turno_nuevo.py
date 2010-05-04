@@ -10,6 +10,9 @@ import datetime
 # sugar que presente los turnos del dia siguiente).
 ######################
 
+# A quien le asigno la encuesta
+usuario_asignado_n = 'eamuchastegui'
+usuario_asignado_id = '4df5932a-1f1f-c9e9-402d-4bd1a040dbed'
 
 # Configuro el logging
 logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
@@ -139,7 +142,8 @@ def procesar(instancia, pathname):
         encuesta.importar_campo('tipo_encuesta', '0')
         encuesta.importar_campo('encuesta_estado', 'No iniciada')
         encuesta.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
-
+        encuesta.importar_campo('assigned_user_name', usuario_asignado_n)
+        encuesta.importar_campo('assigned_user_id', usuario_asignado_id)
         # Defino la fecha tentativa de encuesta
         
         hoy = datetime.datetime.today()
