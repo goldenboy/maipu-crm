@@ -83,6 +83,9 @@ def procesar(instancia, pathname):
         objeto.obtener_campo('fecha_turno').valor >= (datetime.datetime.now() +
                                         datetime.timedelta(days=2)).timetuple():
         objeto.importar_campo('estado_contacto', '0')
+    elif pathname.split('/')[-1][0] == '2':
+        # Auto listo, pongo estado_contacto en 'Sin contacto'
+        objeto.importar_campo('estado_contacto', '0')
     else:
         objeto.importar_campo('estado_contacto', '2')
 
