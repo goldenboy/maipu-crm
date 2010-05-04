@@ -14,6 +14,10 @@ import datetime
 usuario_asignado_n = 'eamuchastegui'
 usuario_asignado_id = '4df5932a-1f1f-c9e9-402d-4bd1a040dbed'
 
+# A quien le asigno los turnos
+usuario_asignado_n_tur = 'ndeamicis'
+usuario_asignado_id_tur = 'b017df97-18be-064a-a4ab-4bd1a04ff610'
+
 # Configuro el logging
 logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
 logger = logging.getLogger("importar_turno")
@@ -92,6 +96,8 @@ def procesar(instancia, pathname):
     else:
         objeto.importar_campo('estado_contacto', '2')
 
+    objeto.importar_campo('assigned_user_name', usuario_asignado_n_tur)
+    objeto.importar_campo('assigned_user_id', usuario_asignado_id_tur)
     logger.debug("Objeto listo.")
 
     # Verifico que todos los objetos externos referenciados (marca, modelo, etc...)

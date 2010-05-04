@@ -4,6 +4,9 @@ import monitor_config
 import logging
 import datetime
 
+# A quien le asigno la encuesta
+usuario_asignado_n = 'eamuchastegui'
+usuario_asignado_id = '4df5932a-1f1f-c9e9-402d-4bd1a040dbed'
 
 # Configuro el logging
 logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
@@ -235,6 +238,8 @@ def procesar_linea(instancia, linea):
     encuesta.importar_campo('patenta_maipu', objeto.obtener_campo('patenta_maipu').a_sugar())
 
     encuesta.importar_campo('name', operacion_id)
+    encuesta.importar_campo('assigned_user_name', usuario_asignado_n)
+    encuesta.importar_campo('assigned_user_id', usuario_asignado_id)
     logger.debug("Grabando una nueva ENCUESTA...")
     encuesta.grabar()
 
