@@ -141,7 +141,7 @@ def procesar(instancia, pathname):
 
     
 #    logger.debug(pathname)
-    if pathname.split('/')[-1][0] == '4' and
+    if pathname.split('/')[-1][0] == '4' and \
             len(instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)) == 0:
         # Orden facturada. Agrego una encuesta de satisfaccion
         encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
