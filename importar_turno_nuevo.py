@@ -141,7 +141,8 @@ def procesar(instancia, pathname):
 
     
 #    logger.debug(pathname)
-    if pathname.split('/')[-1][0] == '4':
+    if pathname.split('/')[-1][0] == '4' and
+            len(instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)) == 0:
         # Orden facturada. Agrego una encuesta de satisfaccion
         encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
         encuesta.importar_campo('turno_id', operacion_id)
@@ -163,6 +164,8 @@ def procesar(instancia, pathname):
 
         # Relaciono la encuesta creada con el cliente
         instancia.relacionar(contacto, encuesta)
+    elif pathname.split('/')[-1][0] == '4':
+        logger.debug("No creo la encuesta porque ya existia")
 
     # Relaciono el turno tambien con el cliente, para que quede en su historia
     instancia.relacionar(contacto, objeto)
