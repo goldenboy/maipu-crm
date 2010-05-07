@@ -70,7 +70,7 @@ def main_loop():
                         logger.debug("Archivo movido (por exito)")
                         break
                     
-                    except ErrorSugar, detalle:
+                    except Exception, detalle:
                         # Si paso por aca es porque hubo algun problema con la
                         # importacion.
                         
