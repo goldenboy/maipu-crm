@@ -58,9 +58,9 @@ def procesar(instancia, pathname):
         campos_utiles.append(campo)
 #    campos_utiles.remove('nombre_cliente')
     campos_utiles.remove('cliente_dni')
-    campos_utiles.remove('marcas_descripcion')
-    campos_utiles.remove('modelos_descripcion')
-    campos_utiles.remove('catalogos_descripcion')
+#    campos_utiles.remove('marcas_descripcion')
+#    campos_utiles.remove('modelos_descripcion')
+#    campos_utiles.remove('catalogos_descripcion')
 
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
