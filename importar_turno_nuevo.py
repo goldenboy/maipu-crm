@@ -104,27 +104,27 @@ def procesar(instancia, pathname):
     # existan en Sugar y sean unicos. En caso de que no existan, los creo. Y si no
     # son unicos, uso el primero?.
 
-    # Primero, verifico que exista el cliente. Si no existe, lo creo
-    logger.debug("Buscando cliente.")
-    valor = objeto.obtener_campo('cliente_id').a_sugar()
-    res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
-    if len(res) == 0:
-        # No hay un cliente con ese id. Lo creo
-        logger.debug("No hay cliente cargado.")
-        contacto = sugar.ObjetoSugar(instancia.modulos['Contacts'])
-        contacto.importar_campo('last_name', unicode(datos[2], 'iso-8859-1'))
-        contacto.importar_campo('phone_home', datos[5])
-        contacto.importar_campo('phone_other', datos[6])
-        contacto.importar_campo('id_maipu_c', datos[3])
-        contacto.importar_campo('dni_numero_c', datos[4])
-        logger.debug("Grabando cliente.")
-        contacto.grabar()
-    else:
-        logger.debug("Existen %i copias del cliente." % len(res))
-        # Hay uno o mas. Elijo el primero
-        contacto = res[0]
-
-    contact_id = contacto.obtener_campo('id').a_sugar()
+    # Primero, verifico que exista el cliente. Si no existe, lo creo.
+    # En realidad hago esto solamente cuando se factura la orden.
+    if pathname.split('/')[-1][0] == '4':
+        logger.debug("Buscando cliente.")
+        valor = objeto.obtener_campo('cliente_id').a_sugar()
+        res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
+        if len(res) == 0:
+            # No hay un cliente con ese id. Lo creo
+            logger.debug("No hay cliente cargado.")
+            contacto = sugar.ObjetoSugar(instancia.modulos['Contacts'])
+            contacto.importar_campo('last_name', unicode(datos[2], 'iso-8859-1'))
+            contacto.importar_campo('phone_home', datos[5])
+            contacto.importar_campo('phone_other', datos[6])
+            contacto.importar_campo('id_maipu_c', datos[3])
+            contacto.importar_campo('dni_numero_c', datos[4])
+            logger.debug("Grabando cliente.")
+            contacto.grabar()
+        else:
+            logger.debug("Existen %i copias del cliente." % len(res))
+            # Hay uno o mas. Elijo el primero
+            contacto = res[0]
     
     # Voy a darle un valor al campo 'name', utilizando el ID del turno
     logger.debug("Dando nombre al turno.")
@@ -164,12 +164,12 @@ def procesar(instancia, pathname):
 
         # Relaciono la encuesta creada con el cliente
         instancia.relacionar(contacto, encuesta)
+        # Relaciono el turno tambien con el cliente, para que quede en su historia
+        instancia.relacionar(contacto, objeto)
     elif pathname.split('/')[-1][0] == '4':
         logger.debug("No creo la encuesta porque ya existia")
 
-    # Relaciono el turno tambien con el cliente, para que quede en su historia
-    instancia.relacionar(contacto, objeto)
-    
+
     return True
 
 
