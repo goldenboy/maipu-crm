@@ -219,7 +219,7 @@ def procesar_linea(instancia, linea):
 
     logger.debug("Antes de tocar encuesta")
 
-    if datos[10] == '1' or datos[10] == '4':
+    if datos[10] == '1' or datos[10] == '4' or datos[10] == '2':
         tipo_venta_enc = '1'
     elif datos[10] == '3':
         tipo_venta_enc = '2'
