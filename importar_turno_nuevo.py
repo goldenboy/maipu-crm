@@ -155,7 +155,7 @@ def procesar(instancia, pathname):
         
         hoy = datetime.datetime.today()
         encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
-                                    datetime.timedelta(days=7)).timetuple())
+                                    datetime.timedelta(days=1)).timetuple())
         
         encuesta.modificar_campo('fecha_facturacion', hoy.timetuple())
 
