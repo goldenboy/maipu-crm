@@ -199,26 +199,19 @@ if __name__ == '__main__':
     # al cliente, que pida que se le llame para agendar un nuevo turno
     
     for turno in busq_ant:
-        # Primero, verifico que exista el cliente. Si no existe, lo creo
+        logger.debug("Anulo turno en el CRM. Le pongo estado_turno=9999")
+        turno.importar_campo('estado_turno', '9999')
+        turno.grabar()
+
+        # Primero, verifico que exista el cliente. Si no existe, salto el turno
         logger.debug("Buscando cliente.")
         valor = turno.obtener_campo('cliente_id').a_sugar()
         res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
+
         if len(res) == 0:
-            # No hay un cliente con ese id. Lo creo
+            # No hay un cliente con ese id. Salto este turno
             logger.debug("No hay cliente cargado.")
-            contacto = sugar.ObjetoSugar(instancia.modulos['Contacts'])
-            contacto.importar_campo('last_name', 
-                            turnos.obtener_campo('nombre_cliente').a_sugar())
-            contacto.importar_campo('phone_home', 
-                            turnos.obtener_campo('telefono_uno').a_sugar())
-            contacto.importar_campo('phone_other', 
-                            turnos.obtener_campo('telefono_dos').a_sugar())
-            contacto.importar_campo('id_maipu_c', 
-                            turnos.obtener_campo('cliente_id').a_sugar())
-#            contacto.importar_campo('dni_numero_c', 
-#                            turnos.obtener_campo('cliente_id').a_sugar())
-            logger.debug("Grabando cliente.")
-            contacto.grabar()
+            continue
         else:
             logger.debug("Existen %i copias del cliente." % len(res))
             # Hay uno o mas. Elijo el primero
@@ -246,8 +239,5 @@ if __name__ == '__main__':
         
         llamada.grabar()
 
-        logger.debug("Anulo turno en el CRM. Le pongo estado_turno=9999")
-        turno.importar_campo('estado_turno', '9999')
-        turno.grabar()
 
 
