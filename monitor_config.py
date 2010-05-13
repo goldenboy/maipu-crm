@@ -16,6 +16,7 @@ PATHS = [   ('/ventas/', 'importar_venta'),
             ('/cliente/', 'importar_cliente'),
             ('/cliente_batch/', 'importar_cliente_batch'),
             ('/turnos/0', 'importar_turno_nuevo'),
+            ('/turnos/1', 'importar_turno_nuevo'),
             ('/turnos/2', 'importar_turno_nuevo'),
             ('/turnos/4', 'importar_turno_nuevo'),
 ]
