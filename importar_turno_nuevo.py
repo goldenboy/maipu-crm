@@ -151,6 +151,9 @@ def procesar(instancia, pathname):
         encuesta.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
         encuesta.importar_campo('assigned_user_name', usuario_asignado_n)
         encuesta.importar_campo('assigned_user_id', usuario_asignado_id)
+        
+        encuesta.importar_campo('marca', unicode(datos[18], 'iso-8859-1'))
+        encuesta.importar_campo('modelo', unicode(datos[20], 'iso-8859-1'))
         # Defino la fecha tentativa de encuesta
         
         hoy = datetime.datetime.today()

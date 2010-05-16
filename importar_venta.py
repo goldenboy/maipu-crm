@@ -240,6 +240,10 @@ def procesar_linea(instancia, linea):
     encuesta.importar_campo('name', operacion_id)
     encuesta.importar_campo('assigned_user_name', usuario_asignado_n)
     encuesta.importar_campo('assigned_user_id', usuario_asignado_id)
+
+    encuesta.importar_campo('marca', unicode(datos[4], 'iso-8859-1'))
+    encuesta.importar_campo('modelo', unicode(datos[6], 'iso-8859-1'))
+
     logger.debug("Grabando una nueva ENCUESTA...")
     encuesta.grabar()
 
