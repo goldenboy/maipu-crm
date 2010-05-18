@@ -143,6 +143,7 @@ def procesar(instancia, pathname):
 #    logger.debug(pathname)
     if pathname.split('/')[-1][0] == '4' and \
             len(instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)) == 0:
+        logger.debug("Es una orden facturada. No existia encuesta")
         # Orden facturada. Agrego una encuesta de satisfaccion
         encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
         encuesta.importar_campo('turno_id', operacion_id)
@@ -157,19 +158,21 @@ def procesar(instancia, pathname):
         # Defino la fecha tentativa de encuesta
         
         hoy = datetime.datetime.today()
-        encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
-                                    datetime.timedelta(days=1)).timetuple())
-        
+        logger.debug("Hoy (fecha_facturacion): %s" % str(hoy))
+        manana = hoy + datetime.timedelta(days=3)
+        logger.debug("Maniana (fecha_tentativa_encuesta): %s" % str(manana))
+
+        encuesta.modificar_campo('fecha_tentativa_encuesta', manana.timetuple())
         encuesta.modificar_campo('fecha_facturacion', hoy.timetuple())
 
         logger.debug("Grabando una nueva ENCUESTA...")
-        encuesta.grabar()
+        logger.debug(encuesta.grabar())
 
         # Relaciono la encuesta creada con el cliente
         instancia.relacionar(contacto, encuesta)
 
     elif pathname.split('/')[-1][0] == '4':
-        logger.debug("No creo la encuesta porque ya existia")
+        logger.debug("Es una orden facturada. Ya existia la encuesta")
     
     # Relaciono el turno tambien con el cliente, para que quede en su historia
     instancia.relacionar(contacto, objeto)
