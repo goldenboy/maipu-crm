@@ -170,12 +170,12 @@ def procesar(instancia, pathname):
 
         # Relaciono la encuesta creada con el cliente
         instancia.relacionar(contacto, encuesta)
+        # Relaciono el turno tambien con el cliente, para que quede en su historia
+        instancia.relacionar(contacto, objeto)
 
     elif pathname.split('/')[-1][0] == '4':
         logger.debug("Es una orden facturada. Ya existia la encuesta")
     
-    # Relaciono el turno tambien con el cliente, para que quede en su historia
-    instancia.relacionar(contacto, objeto)
 
 
     return True
