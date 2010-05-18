@@ -214,7 +214,7 @@ def procesar_linea(instancia, linea):
         
     if datos[10] == '1' or datos[10] == '4':
         # Es venta tradicional o usados
-        delta = 7
+        delta = 15
     else:
         # Sino, debe ser venta especial o planes
         delta = 15
