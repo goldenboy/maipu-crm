@@ -200,9 +200,11 @@ def procesar_linea(instancia, linea):
     if len(busq) != 0:
         # si hay algun resultado, uso el primero
         encuesta = busq[0]
+        existia_encuesta = True
     else:
         # Creo un objeto nuevo del modulo mm002_Encuestas.
         encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
+        existia_encuesta = False
 
     encuesta.importar_campo('venta_id', operacion_id)
     encuesta.importar_campo('name', 'Encuesta de venta %s' % operacion_id)
@@ -227,28 +229,28 @@ def procesar_linea(instancia, linea):
         logger.error("Tipo de venta no soportado")
         raise sugar.ErrorSugar("Tipo de venta codigo no soportado")
     
-    encuesta.importar_campo('tipo_encuesta', unicode(tipo_venta_enc, 'iso-8859-1'))
-    encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
+    if not existia_encuesta:
+        encuesta.importar_campo('tipo_encuesta', unicode(tipo_venta_enc, 'iso-8859-1'))
+        encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
                                     datetime.timedelta(days=delta)).timetuple())
-    
-    encuesta.importar_campo('encuesta_estado', 'No iniciada')
-    encuesta.importar_campo('fecha_facturacion', 
+        encuesta.importar_campo('encuesta_estado', 'No iniciada')
+        encuesta.importar_campo('fecha_facturacion', 
                         objeto.obtener_campo('fecha_venta').a_sugar())
     
-    encuesta.importar_campo('patenta_maipu', objeto.obtener_campo('patenta_maipu').a_sugar())
+        encuesta.importar_campo('patenta_maipu', objeto.obtener_campo('patenta_maipu').a_sugar())
 
-    encuesta.importar_campo('name', operacion_id)
-    encuesta.importar_campo('assigned_user_name', usuario_asignado_n)
-    encuesta.importar_campo('assigned_user_id', usuario_asignado_id)
+        encuesta.importar_campo('name', operacion_id)
+        encuesta.importar_campo('assigned_user_name', usuario_asignado_n)
+        encuesta.importar_campo('assigned_user_id', usuario_asignado_id)
 
-    encuesta.importar_campo('marca', unicode(datos[4], 'iso-8859-1'))
-    encuesta.importar_campo('modelo', unicode(datos[6], 'iso-8859-1'))
+        encuesta.importar_campo('marca', unicode(datos[4], 'iso-8859-1'))
+        encuesta.importar_campo('modelo', unicode(datos[6], 'iso-8859-1'))
 
-    logger.debug("Grabando una nueva ENCUESTA...")
-    encuesta.grabar()
+        logger.debug("Grabando una nueva ENCUESTA...")
+        encuesta.grabar()
 
-    # Relaciono la encuesta creada con el cliente
-    instancia.relacionar(contacto, encuesta)
+        # Relaciono la encuesta creada con el cliente
+        instancia.relacionar(contacto, encuesta)
     
     return True
 
