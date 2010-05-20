@@ -104,27 +104,34 @@ def procesar(instancia, pathname):
     # existan en Sugar y sean unicos. En caso de que no existan, los creo. Y si no
     # son unicos, uso el primero?.
 
-    # Primero, verifico que exista el cliente. Si no existe, lo creo.
+    # Primero, verifico que exista el cliente.
+    
+    logger.debug("Buscando cliente.")
+    valor = objeto.obtener_campo('cliente_id').a_sugar()
+    res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
+    if len(res) == 0:
+        existe_cliente = False
+    else:
+        existe_cliente = True
+        logger.debug("Existen %i copias del cliente." % len(res))
+        # Hay uno o mas. Elijo el primero
+        contacto = res[0]
+    
+    
+    # Si no existe el cliente, lo creo.
     # En realidad hago esto solamente cuando se factura la orden.
-    if pathname.split('/')[-1][0] == '4':
-        logger.debug("Buscando cliente.")
-        valor = objeto.obtener_campo('cliente_id').a_sugar()
-        res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
-        if len(res) == 0:
-            # No hay un cliente con ese id. Lo creo
-            logger.debug("No hay cliente cargado.")
-            contacto = sugar.ObjetoSugar(instancia.modulos['Contacts'])
-            contacto.importar_campo('last_name', unicode(datos[2], 'iso-8859-1'))
-            contacto.importar_campo('phone_home', datos[5])
-            contacto.importar_campo('phone_other', datos[6])
-            contacto.importar_campo('id_maipu_c', datos[3])
-            contacto.importar_campo('dni_numero_c', datos[4])
-            logger.debug("Grabando cliente.")
-            contacto.grabar()
-        else:
-            logger.debug("Existen %i copias del cliente." % len(res))
-            # Hay uno o mas. Elijo el primero
-            contacto = res[0]
+    if pathname.split('/')[-1][0] == '4' and not existe_cliente:
+        # No hay un cliente con ese id. Lo creo
+        logger.debug("No hay cliente cargado.")
+        contacto = sugar.ObjetoSugar(instancia.modulos['Contacts'])
+        contacto.importar_campo('last_name', unicode(datos[2], 'iso-8859-1'))
+        contacto.importar_campo('phone_home', datos[5])
+        contacto.importar_campo('phone_other', datos[6])
+        contacto.importar_campo('id_maipu_c', datos[3])
+        contacto.importar_campo('dni_numero_c', datos[4])
+        logger.debug("Grabando cliente.")
+        contacto.grabar()
+
     
     # Voy a darle un valor al campo 'name', utilizando el ID del turno
     logger.debug("Dando nombre al turno.")
@@ -139,8 +146,8 @@ def procesar(instancia, pathname):
     logger.debug("Grabando un nuevo TURNO...")
     logger.debug(objeto.grabar())
 
-    
-#    logger.debug(pathname)
+
+    # Creo encuesta de satisfaccion si estoy en el estado 4    
     if pathname.split('/')[-1][0] == '4' and \
             len(instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)) == 0:
         logger.debug("Es una orden facturada. No existia encuesta")
@@ -170,14 +177,15 @@ def procesar(instancia, pathname):
 
         # Relaciono la encuesta creada con el cliente
         instancia.relacionar(contacto, encuesta)
-        # Relaciono el turno tambien con el cliente, para que quede en su historia
-        instancia.relacionar(contacto, objeto)
 
     elif pathname.split('/')[-1][0] == '4':
         logger.debug("Es una orden facturada. Ya existia la encuesta")
     
-
-
+    
+    if existe_cliente:
+        # Relaciono el turno tambien con el cliente, para que quede en su historia
+        instancia.relacionar(contacto, objeto)
+    
     return True
 
 
