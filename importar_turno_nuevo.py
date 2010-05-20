@@ -106,21 +106,26 @@ def procesar(instancia, pathname):
 
     # Primero, verifico que exista el cliente.
     
-    logger.debug("Buscando cliente.")
+    logger.debug("Buscando cliente")
     valor = objeto.obtener_campo('cliente_id').a_sugar()
-    res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
-    if len(res) == 0:
+    if valor == '0':
+        logger.debug("No hay dato de cliente cargado en el turno aun")
         existe_cliente = False
     else:
-        existe_cliente = True
-        logger.debug("Existen %i copias del cliente." % len(res))
-        # Hay uno o mas. Elijo el primero
-        contacto = res[0]
+        res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
+        if len(res) == 0:
+            existe_cliente = False
+        else:
+            existe_cliente = True
+            logger.debug("Existen %i copias del cliente." % len(res))
+            # Hay uno o mas. Elijo el primero
+            contacto = res[0]
     
     
     # Si no existe el cliente, lo creo.
     # En realidad hago esto solamente cuando se factura la orden.
-    if pathname.split('/')[-1][0] == '4' and not existe_cliente:
+    if pathname.split('/')[-1][0] == '4' and not existe_cliente and \
+        objeto.obtener_campo('cliente_id').a_sugar() != '0':
         # No hay un cliente con ese id. Lo creo
         logger.debug("No hay cliente cargado.")
         contacto = sugar.ObjetoSugar(instancia.modulos['Contacts'])
