@@ -74,7 +74,7 @@ if __name__ == '__main__':
         llamada.importar_campo('assigned_user_name', usuario_asignado_n)
         llamada.importar_campo('assigned_user_id', usuario_asignado_id)
         llamada.importar_campo('direction', 'Outbound')
-        llamada.importar_campo('parent_type', u'Calls')
+        llamada.importar_campo('parent_type', u'mm002_Turnos')
         llamada.importar_campo('parent_id', turno_id)
         llamada.importar_campo('duration_hours', '0')
         llamada.importar_campo('duration_minutes', '5')
