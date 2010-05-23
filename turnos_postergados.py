@@ -9,8 +9,8 @@ import logging
 ######################
 
 # A quien le asigno la llamada
-usuario_asignado_n = 'eamuchastegui'
-usuario_asignado_id = '4df5932a-1f1f-c9e9-402d-4bd1a040dbed'
+usuario_asignado_n = 'ndeamicis'
+usuario_asignado_id = 'b017df97-18be-064a-a4ab-4bd1a04ff610'
 
 # Configuro el logging
 logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
