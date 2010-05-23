@@ -222,7 +222,7 @@ def obtener_instancia():
     instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
                     crm_config.CLAVE, ['mm002_Turnos', 'mm002_Marcas',
                                         'mm002_Modelo', 'mm002_Encuestas',
-                                        'Contacts'],
+                                        'Contacts', 'Calls'],
                     crm_config.LDAP_KEY, crm_config.LDAP_IV)
 
     return instancia
