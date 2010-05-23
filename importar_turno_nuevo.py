@@ -83,18 +83,14 @@ def procesar(instancia, pathname):
 
     # Si el turno es en mas de 72hs, y estoy dando de alta el turno,
     # indico que el operador del call debe llamar al "contacto"
-    #  0 es "Sin contacto"
-    #  1 es "Contacto fallido"
-    #  2 es "Contactado satisfactoriamente"
     if pathname.split('/')[-1][0] == '0' and \
         objeto.obtener_campo('fecha_turno').valor >= (datetime.datetime.now() +
                                         datetime.timedelta(days=2)).timetuple():
-        objeto.importar_campo('estado_contacto', '0')
-    elif pathname.split('/')[-1][0] == '2':
-        # Auto listo, pongo estado_contacto en 'Sin contacto'
-        objeto.importar_campo('estado_contacto', '0')
+        objeto.importar_campo('estado_recordatorio', 'Sin contacto')
     else:
-        objeto.importar_campo('estado_contacto', '2')
+        # Auto listo, pongo estado_recordatorio en 'OK'
+        objeto.importar_campo('estado_recordatorio', 'OK')
+
 
     objeto.importar_campo('assigned_user_name', usuario_asignado_n_tur)
     objeto.importar_campo('assigned_user_id', usuario_asignado_id_tur)
