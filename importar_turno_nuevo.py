@@ -170,8 +170,8 @@ def procesar(instancia, pathname):
         llamada.importar_campo('name', u'Recordatorio de turno')
         llamada.importar_campo('description', u"""Llamar al contacto %s para 
         recordarle el turno de taller por motivo '%s'.
-        """ % (turno.obtener_campo('nombre_contacto').a_sugar(), 
-                turno.obtener_campo('motivo_turno').a_sugar()))
+        """ % (objeto.obtener_campo('nombre_contacto').a_sugar(), 
+                objeto.obtener_campo('motivo_turno').a_sugar()))
         
         llamada.grabar()
     
