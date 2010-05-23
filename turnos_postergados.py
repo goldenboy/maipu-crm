@@ -62,23 +62,9 @@ if __name__ == '__main__':
     for turno in busq_ant:
         logger.debug("Anulo turno en el CRM. Le pongo estado_turno=9999")
         turno.importar_campo('estado_turno', '9999')
+        turno.importar_campo('estado_recuperacion', 'Sin contacto')
+        turno_id = turno.obtener_campo('id').a_sugar()
         turno.grabar()
-
-        # Primero, verifico que exista el cliente. Si no existe, salto el turno
-        logger.debug("Buscando cliente.")
-        valor = turno.obtener_campo('cliente_id').a_sugar()
-        res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
-
-        if len(res) == 0:
-            # No hay un cliente con ese id. Salto este turno
-            logger.debug("No hay cliente cargado.")
-            continue
-        else:
-            logger.debug("Existen %i copias del cliente." % len(res))
-            # Hay uno o mas. Elijo el primero
-            contacto = res[0]
-    
-        contact_id = contacto.obtener_campo('id').a_sugar()
 
 
         # Creo la llamada nueva
@@ -88,8 +74,8 @@ if __name__ == '__main__':
         llamada.importar_campo('assigned_user_name', usuario_asignado_n)
         llamada.importar_campo('assigned_user_id', usuario_asignado_id)
         llamada.importar_campo('direction', 'Outbound')
-        llamada.importar_campo('parent_type', u'Contacts')
-        llamada.importar_campo('parent_id', contact_id)
+        llamada.importar_campo('parent_type', u'Calls')
+        llamada.importar_campo('parent_id', turno_id)
         llamada.importar_campo('duration_hours', '0')
         llamada.importar_campo('duration_minutes', '5')
         llamada.importar_campo('name', u'Reprogramar turno')
