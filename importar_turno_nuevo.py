@@ -84,10 +84,14 @@ def procesar(instancia, pathname):
     # Si el turno es en mas de 72hs, y estoy dando de alta el turno,
     # indico que el operador del call debe llamar al "contacto"
     if pathname.split('/')[-1][0] == '0' and \
+        objeto.obtener_campo('id').a_sugar() == '' and \
         objeto.obtener_campo('fecha_turno').valor >= (datetime.datetime.now() +
                                         datetime.timedelta(days=2)).timetuple():
         objeto.importar_campo('estado_recordatorio', 'Sin contacto')
+        crear_llamada_recordatorio = True
+        
     else:
+        crear_llamada_recordatorio = False
         # Auto listo, pongo estado_recordatorio en 'OK'
         objeto.importar_campo('estado_recordatorio', 'OK')
 
@@ -142,12 +146,35 @@ def procesar(instancia, pathname):
 
 
     # Aqui ya estan creadas todas las entradas en Sugar de las cuales esta venta
-    # depende. Ya puedo agrear la venta a la base de datos.
+    # depende. Ya puedo agrear el turno a la base de datos.
 
     logger.debug("Grabando un nuevo TURNO...")
     logger.debug(objeto.grabar())
 
 
+    if crear_llamada_recordatorio:
+        
+        turno_id = objeto.obtener_campo('id').a_sugar()
+        
+        # Creo la llamada nueva
+        llamada = sugar.ObjetoSugar(instancia.modulos['Calls'])
+
+        llamada.importar_campo('status', 'Planned')
+        llamada.importar_campo('assigned_user_name', usuario_asignado_n_tur)
+        llamada.importar_campo('assigned_user_id', usuario_asignado_id_tur)
+        llamada.importar_campo('direction', 'Outbound')
+        llamada.importar_campo('parent_type', u'mm002_Turnos')
+        llamada.importar_campo('parent_id', turno_id)
+        llamada.importar_campo('duration_hours', '0')
+        llamada.importar_campo('duration_minutes', '5')
+        llamada.importar_campo('name', u'Recordatorio de turno')
+        llamada.importar_campo('description', u"""Llamar al contacto %s para 
+        recordarle el turno de taller de mañana por motivo '%s'.
+        """ % (turno.obtener_campo('nombre_contacto').a_sugar(), 
+                turno.obtener_campo('motivo_turno').a_sugar()))
+        
+        llamada.grabar()
+    
     # Creo encuesta de satisfaccion si estoy en el estado 4    
     if pathname.split('/')[-1][0] == '4' and \
             len(instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)) == 0:
