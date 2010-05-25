@@ -62,7 +62,7 @@ if __name__ == '__main__':
     for turno in busq_ant:
         logger.debug("Anulo turno en el CRM. Le pongo estado_turno=9999")
         turno.importar_campo('estado_turno', '9999')
-        turno.importar_campo('estado_recuperacion', 'Sin contacto')
+        turno.importar_campo('resultado_recuperacion', 'Sin contacto')
         turno_id = turno.obtener_campo('id').a_sugar()
         turno.grabar()
 
