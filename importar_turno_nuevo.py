@@ -57,7 +57,7 @@ def procesar(instancia, pathname):
     for campo in campos:
         campos_utiles.append(campo)
 #    campos_utiles.remove('nombre_cliente')
-    campos_utiles.remove('cliente_dni')
+#    campos_utiles.remove('cliente_dni')
 #    campos_utiles.remove('marcas_descripcion')
 #    campos_utiles.remove('modelos_descripcion')
 #    campos_utiles.remove('catalogos_descripcion')
