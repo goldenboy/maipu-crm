@@ -2,6 +2,7 @@ import sugar
 import crm_config
 import monitor_config
 import logging
+import datetime
 
 ######################
 # Con este script creo llamadas de reprogramacion para aquellos turnos del dia
@@ -79,6 +80,7 @@ if __name__ == '__main__':
         llamada.importar_campo('duration_hours', '0')
         llamada.importar_campo('duration_minutes', '5')
         llamada.importar_campo('name', u'Reprogramar turno')
+        llamada.modificar_campo('date_start', datetime.date.timetuple(datetime.datetime.now()))
         llamada.importar_campo('description', u"""Llamar al contacto %s para 
         reprogramar el turno de taller por motivo '%s'.
         """ % (turno.obtener_campo('nombre_contacto').a_sugar(), 
