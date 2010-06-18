@@ -170,7 +170,7 @@ def procesar(instancia, pathname):
         fecha_anio = objeto.obtener_campo('fecha_turno').valor.tm_year
         fecha_mes = objeto.obtener_campo('fecha_turno').valor.tm_mon
         fecha_dia = objeto.obtener_campo('fecha_turno').valor.tm_mday
-        llamada.modificar_campo('date_start', (datetime.datetime(fecha_anio, fecha_mes, fecha_dia) - datetime.timedelta(days=1)).timetuple())
+        llamada.modificar_campo('date_start', (datetime.datetime(fecha_anio, fecha_mes, fecha_dia, 12, 0) - datetime.timedelta(days=1)).timetuple())
         llamada.importar_campo('name', u'Recordatorio de turno')
         llamada.importar_campo('description', u"""Llamar al contacto %s para 
         recordarle el turno de taller por motivo '%s'.
