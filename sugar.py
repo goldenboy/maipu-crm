@@ -245,6 +245,7 @@ TipoSugar_name = TipoSugar_varchar
 TipoSugar_parent_type = TipoSugar_varchar
 TipoSugar_user_name = TipoSugar_varchar
 TipoSugar_url = TipoSugar_varchar
+TipoSugar_currency = TipoSugar_id
 
 
 class InstanciaSugar:
