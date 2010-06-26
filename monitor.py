@@ -55,7 +55,8 @@ def main_loop():
                             else:
                                 break
 
-                        modulo.procesar(instancia, event.pathname)
+                        if not modulo.procesar(instancia, event.pathname):
+                            raise ErrorSugar
                     
                         # Si funciono correctamente, paso por aca.
                         # Muevo el archivo a la carpeta de exito
