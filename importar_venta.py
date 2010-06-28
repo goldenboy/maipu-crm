@@ -4,6 +4,10 @@ import monitor_config
 import logging
 import datetime
 
+# Moneda
+
+currency_id = '9f4c22ed-f82e-9aa2-5f77-4c28f762e851'
+
 # A quien le asigno la encuesta
 usuario_asignado_n = 'eamuchastegui'
 usuario_asignado_id = '4df5932a-1f1f-c9e9-402d-4bd1a040dbed'
@@ -42,7 +46,7 @@ def procesar_linea(instancia, linea):
             'fecha_venta', 'tipo_venta_codigo', 'tipo_venta_descripcion',
             'vendedor_codigo', 'vendedor_nombre', 'sucursales_codigo',
             'sucursales_descripcion', 'gestor_codigo', 'gestor_nombre',
-            'patenta_maipu']
+            'patenta_maipu', 'importe']
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
@@ -55,6 +59,7 @@ def procesar_linea(instancia, linea):
             objeto.importar_campo(campo[0], unicode(campo[1].rstrip(),
                                                             'iso-8859-1'))
 
+    objeto.importar_campo('currency_id', currency_id)
     logger.debug("Objeto listo.")
 
     # Verifico que todos los objetos externos referenciados (marca, modelo, etc...)

@@ -241,11 +241,40 @@ class TipoSugar_int(TipoSugar):
             return None
 
 
+class TipoSugar_decimal(TipoSugar):
+    """Dato que almacena un valor decimal en SugarCRM."""
+    def __init__(self, valor_inicial = None, opciones = None):
+        if valor_inicial not in [None, '']:
+            self.valor = float(valor_inicial)
+        else:
+            self.valor = None
+        
+    def validar(self, valor):
+        if type(valor) != types.FloatType:
+            raise ErrorSugar("decimal: Tipo incorrecto. Esperaba un float.")
+        return True
+    
+    def a_sugar(self):
+        if self.valor != None:
+            return str(self.valor)
+        else:
+            return ''
+
+    def de_string(self, valor):
+        try:
+            if valor == '':
+                valor = '0.0'
+            valor_nuevo = float(valor)
+            return valor_nuevo
+        except ValueError:
+            return None
+
+
 TipoSugar_name = TipoSugar_varchar
 TipoSugar_parent_type = TipoSugar_varchar
 TipoSugar_user_name = TipoSugar_varchar
 TipoSugar_url = TipoSugar_varchar
-TipoSugar_currency = TipoSugar_id
+TipoSugar_currency = TipoSugar_decimal
 
 
 class InstanciaSugar:
