@@ -18,6 +18,7 @@ logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
 logger = logging.getLogger("turnos_postergados")
 
 marcas = ['10', '20', '30']
+offset_gmt = -3
 
 
 def obtener_instancia():
@@ -86,7 +87,7 @@ if __name__ == '__main__':
         fecha_anio = turno.obtener_campo('fecha_turno').valor.tm_year
         fecha_mes = turno.obtener_campo('fecha_turno').valor.tm_mon
         fecha_dia = turno.obtener_campo('fecha_turno').valor.tm_mday
-        llamada.modificar_campo('date_start', datetime.datetime(fecha_anio, fecha_mes, fecha_dia, hora_limite/100, 59).timetuple())
+        llamada.modificar_campo('date_start', datetime.datetime(fecha_anio, fecha_mes, fecha_dia, hora_limite/100 - offset_gmt, 59).timetuple())
         llamada.importar_campo('description', u"""Llamar al contacto %s para 
         reprogramar el turno de taller por motivo '%s'.
         """ % (turno.obtener_campo('nombre_contacto').a_sugar(), 
