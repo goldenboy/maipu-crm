@@ -17,7 +17,7 @@ usuario_asignado_id = 'b017df97-18be-064a-a4ab-4bd1a04ff610'
 logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
 logger = logging.getLogger("turnos_postergados")
 
-
+marcas = ['10', '20', '30']
 
 
 def obtener_instancia():
@@ -52,19 +52,19 @@ if __name__ == '__main__':
                                         fecha_turno=hoy, estado_turno='1366')
     
     for turno in busq_todos:
-        logger.debug("De hoy: turno_id: %s, fecha_turno: %s" % (turno.obtener_campo('turno_id').a_sugar, turno.obtener_campo('fecha_turno').a_sugar))
+        logger.debug("De hoy: turno_id: %s, hora_turno: %s, marca_codigo: %s" % (turno.obtener_campo('turno_id').a_sugar(), turno.obtener_campo('hora_turno').a_sugar(), turno.obtener_campo('marcas_codigo').a_sugar()))
         
     # Filtro los turnos, dejando aca solo los que tengan hora anterior a la 
     # pasada como argumento
     busq_ant = [turno for turno in busq_todos
-                    if turno.obtener_campo('hora_turno').valor <= hora_limite]
+                    if turno.obtener_campo('hora_turno').valor <= hora_limite and turno.obtener_campo('marcas_codigo').a_sugar() in marcas]
 
 
     # Para todos los turnos de busq_ant, tengo que crear una llamada asociada
     # al cliente, que pida que se le llame para agendar un nuevo turno
     
     for turno in busq_ant:
-        logger.debug("Anular: turno_id: %s, hora_turno: %s" % (turno.obtener_campo('turno_id').a_sugar, turno.obtener_campo('hora_turno').a_sugar))
+        logger.debug("Anular: turno_id: %s, hora_turno: %s, marca_codigo: %s" % (turno.obtener_campo('turno_id').a_sugar(), turno.obtener_campo('hora_turno').a_sugar(), turno.obtener_campo('marcas_codigo').a_sugar()))
         turno.importar_campo('estado_turno', '9999')
         turno.importar_campo('resultado_recuperacion', 'Sin contacto')
         turno_id = turno.obtener_campo('id').a_sugar()
