@@ -50,7 +50,10 @@ if __name__ == '__main__':
     # Busco todos los turnos de hoy que tengan estado 1366 (no ingresaron aun)
     busq_todos = instancia.modulos['mm002_Turnos'].buscar(cantidad=1000,
                                         fecha_turno=hoy, estado_turno='1366')
-
+    
+    for turno in busq_todos:
+        logger.debug("De hoy: turno_id: %s, fecha_turno: %s" % (turno.obtener_campo('turno_id').a_sugar, turno.obtener_campo('fecha_turno').a_sugar))
+        
     # Filtro los turnos, dejando aca solo los que tengan hora anterior a la 
     # pasada como argumento
     busq_ant = [turno for turno in busq_todos
@@ -61,7 +64,7 @@ if __name__ == '__main__':
     # al cliente, que pida que se le llame para agendar un nuevo turno
     
     for turno in busq_ant:
-        logger.debug("Anulo turno en el CRM. Le pongo estado_turno=9999")
+        logger.debug("Anular: turno_id: %s, hora_turno: %s" % (turno.obtener_campo('turno_id').a_sugar, turno.obtener_campo('hora_turno').a_sugar))
         turno.importar_campo('estado_turno', '9999')
         turno.importar_campo('resultado_recuperacion', 'Sin contacto')
         turno_id = turno.obtener_campo('id').a_sugar()
@@ -80,7 +83,10 @@ if __name__ == '__main__':
         llamada.importar_campo('duration_hours', '0')
         llamada.importar_campo('duration_minutes', '5')
         llamada.importar_campo('name', u'Reprogramar turno')
-        llamada.modificar_campo('date_start', datetime.date.timetuple(datetime.datetime.now()))
+        fecha_anio = turno.obtener_campo('fecha_turno').valor.tm_year
+        fecha_mes = turno.obtener_campo('fecha_turno').valor.tm_mon
+        fecha_dia = turno.obtener_campo('fecha_turno').valor.tm_mday
+        llamada.modificar_campo('date_start', datetime.datetime(fecha_anio, fecha_mes, fecha_dia, hora_limite/100, 59).timetuple())
         llamada.importar_campo('description', u"""Llamar al contacto %s para 
         reprogramar el turno de taller por motivo '%s'.
         """ % (turno.obtener_campo('nombre_contacto').a_sugar(), 
