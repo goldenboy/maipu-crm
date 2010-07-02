@@ -194,6 +194,11 @@ def procesar(instancia, pathname):
         
         encuesta.importar_campo('marca', unicode(datos[18], 'iso-8859-1'))
         encuesta.importar_campo('modelo', unicode(datos[20], 'iso-8859-1'))
+        
+        # Agrego el campo de garantia
+        encuesta.modificar_campo('serv_es_garantia_c',
+                            objeto.obtener_campo('garantia').valor)
+        
         # Defino la fecha tentativa de encuesta
         
         hoy = datetime.datetime.today()
