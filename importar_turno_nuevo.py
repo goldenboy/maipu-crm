@@ -136,6 +136,8 @@ def procesar(instancia, pathname):
         contacto.importar_campo('dni_numero_c', datos[4])
         logger.debug("Grabando cliente.")
         contacto.grabar()
+        
+        existe_cliente = True
 
     
     # Voy a darle un valor al campo 'name', utilizando el ID del turno
