@@ -83,10 +83,26 @@ def procesar(instancia, pathname):
 
     # Si el turno es en mas de 72hs, y estoy dando de alta el turno,
     # indico que el operador del call debe llamar al "contacto"
+    
+    # Calculo cuantas son 72 horas habiles... Bien al pedo, obvio. Probablemente
+    # lo cambien cuando se den cuenta de que no sirve
+    sumados = 0
+    offset_dias = 0
+    while sumados < 3:
+        dia = datetime.datetime.now() + datetime.timedelta(days=offset_dias)
+        if calendar.weekday(dia.year, dia.month, dia.day) <= 4:
+            sumados += 1
+        offset_dias += 1
+    
+    # Calculo los segundos pasados hasta la hora del turno para el offset
+    hora = objeto.obtener_campo('hora_turno').valor
+    segundos = (hora / 100) * 3600 + (hora % 100) * 60
+    
     if pathname.split('/')[-1][0] == '0' and \
         objeto.obtener_campo('id').a_sugar() == '' and \
         objeto.obtener_campo('fecha_turno').valor >= (datetime.datetime.now() +
-                                        datetime.timedelta(days=2)).timetuple():
+                            datetime.timedelta(days=offset_dias) -
+                            datetime.timedelta(seconds=segundos)).timetuple():
         objeto.importar_campo('estado_recordatorio', 'Sin contacto')
         crear_llamada_recordatorio = True
         
@@ -169,10 +185,21 @@ def procesar(instancia, pathname):
         llamada.importar_campo('parent_id', turno_id)
         llamada.importar_campo('duration_hours', '0')
         llamada.importar_campo('duration_minutes', '5')
+
         fecha_anio = objeto.obtener_campo('fecha_turno').valor.tm_year
         fecha_mes = objeto.obtener_campo('fecha_turno').valor.tm_mon
         fecha_dia = objeto.obtener_campo('fecha_turno').valor.tm_mday
-        llamada.modificar_campo('date_start', (datetime.datetime(fecha_anio, fecha_mes, fecha_dia, 12, 0) - datetime.timedelta(days=1)).timetuple())
+        
+        if objeto.obtener_campo('fecha_turno').valor.tm_wday == 0:
+            # Si el turno era lunes, la llamada es viernes
+            offset_dias = 3
+        else:
+            offset_dias = 1
+        
+        llamada.modificar_campo('date_start',
+                (datetime.datetime(fecha_anio, fecha_mes, fecha_dia, 12, 0) -
+                    datetime.timedelta(days=offset_dias)).timetuple())
+        
         llamada.importar_campo('name', u'Recordatorio de turno')
         llamada.importar_campo('description', u"""Llamar al contacto %s para 
         recordarle el turno de taller por motivo '%s'.
