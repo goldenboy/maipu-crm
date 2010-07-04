@@ -198,7 +198,7 @@ def procesar(instancia, pathname):
         encuesta.importar_campo('modelo', unicode(datos[20], 'iso-8859-1'))
         
         # Agrego el campo de garantia
-        encuesta.modificar_campo('serv_es_garantia_c',
+        encuesta.modificar_campo('serv_es_garantia',
                             objeto.obtener_campo('garantia').valor)
         
         # Defino la fecha tentativa de encuesta

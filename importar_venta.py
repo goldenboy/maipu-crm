@@ -251,7 +251,7 @@ def procesar_linea(instancia, linea):
         encuesta.importar_campo('marca', unicode(datos[4], 'iso-8859-1'))
         encuesta.importar_campo('modelo', unicode(datos[6], 'iso-8859-1'))
         
-        encuesta.importar_campo('sucursal_descripcion_c',
+        encuesta.importar_campo('sucursal_descripcion',
                                     unicode(datos[15], 'iso-8859-1'))
         logger.debug("Sucursal de ENCUESTA: " + unicode(datos[15], 'iso-8859-1'))
 
