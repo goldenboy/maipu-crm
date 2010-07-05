@@ -3,6 +3,7 @@ import crm_config
 import monitor_config
 import logging
 import datetime
+import calendar
 
 ######################
 # Con este script doy de alta un turno nuevo en el sugar, y le indico a los
