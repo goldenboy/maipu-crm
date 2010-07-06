@@ -62,7 +62,8 @@ def procesar_linea(instancia, linea):
     # Para cada repuesto a importar, hago una busqueda de repuestos por 
     # numero_factura, por si los repuestos fueron ingresados previamente
     busq = instancia.modulos['mm002_Repuestos'].buscar(numero_factura=datos[2], 
-                                                        tipo_factura=datos[1])
+                                                        tipo_factura=datos[1],
+                                                        marca_codigo=datos[3])
     if len(busq) != 0:
         # si hay algun resultado, uso el primero
         objeto = busq[0]
