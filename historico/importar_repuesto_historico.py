@@ -120,14 +120,14 @@ def procesar_linea(instancia, linea):
         marca_descripcion = marca.obtener_campo('marcas_descripcion').a_sugar()
         
         # Cargo la descripcion de la marca en el repuesto
-        objeto.importar_campo('marca_descripcion', marca_descripcion)
+        objeto.importar_campo('marca_descripcion', unicode(marca_descripcion))
 
 
     # Voy a darle un valor al campo 'name', utilizando el ID del turno
     logger.debug("Dando nombre al repuesto.")
     nombre = objeto.obtener_campo('tipo_factura').a_sugar() + ' ' + \
                 objeto.obtener_campo('numero_factura').a_sugar()
-    objeto.importar_campo('name', unicode(nombre, 'iso-8859-1'))
+    objeto.importar_campo('name', unicode(nombre))
 
 
 
