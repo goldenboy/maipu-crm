@@ -70,7 +70,8 @@ def procesar_linea(instancia, linea):
     valor = objeto.obtener_campo('id_maipu_cliente').a_sugar()
     res = instancia.modulos['Contacts'].buscar(id_maipu_c=valor)
     if len(res) > 1:
-        raise sugar.ErrorSugar('Existen clientes duplicados con ese ID')
+        logger.warn('Existen clientes duplicados con ese ID')
+        contacto = res[0]
     elif len(res) == 0:
         # Debo crear un objeto cliente nuevo y agregarlo.
         obj_nuevo = sugar.ObjetoSugar(instancia.modulos['Contacts'])
@@ -80,8 +81,7 @@ def procesar_linea(instancia, linea):
         logger.debug("Grabando un nuevo cliente...")
         obj_nuevo.grabar()
         contacto = obj_nuevo
-    else:
-        contacto = res[0]
+        
 
     # Guardo el ID de sugar para mas tarde
     contact_id = contacto.obtener_campo('id').a_sugar()
