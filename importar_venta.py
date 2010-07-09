@@ -72,6 +72,8 @@ def procesar_linea(instancia, linea):
     if len(res) > 1:
         logger.warn('Existen clientes duplicados con ese ID')
         contacto = res[0]
+    elif len(res) == 1:
+        contacto = res[0]
     elif len(res) == 0:
         # Debo crear un objeto cliente nuevo y agregarlo.
         obj_nuevo = sugar.ObjetoSugar(instancia.modulos['Contacts'])
