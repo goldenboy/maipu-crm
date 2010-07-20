@@ -52,7 +52,8 @@ def procesar(instancia, pathname):
             'asesor_nombre', 'fecha_entrega', 'hora_entrega', 'estado_turno',
             'sucursales_codigo',
             'marcas_codigo', 'marcas_descripcion', 'modelos_codigo', 'modelos_descripcion',
-            'catalogos_codigo', 'catalogos_descripcion', 'orden_id', 'garantia']
+            'catalogos_codigo', 'catalogos_descripcion', 'orden_id', 'garantia',
+            'fecha_facturacion', 'importe']
     # hago copia y quito los elementos que no van al sugar
     campos_utiles = []
     for campo in campos:
@@ -72,8 +73,7 @@ def procesar(instancia, pathname):
             valor_checkbox = (lambda x: x == 'G')(campo[1])
             logger.debug(campo[0] + ' -> ' + str(valor_checkbox))
             objeto.modificar_campo(campo[0].rstrip(), valor_checkbox)
-        elif (campo[0] == 'fecha_entrega' or campo[0] == 'fecha_turno') and \
-                                    campo[1] == '00000000':
+        elif (campo[0].startswith('fecha')) and campo[1] == '00000000':
             # No importo este campo, lo dejo en blanco
             pass
         else:
