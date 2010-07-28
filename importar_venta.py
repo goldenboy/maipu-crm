@@ -202,66 +202,70 @@ def procesar_linea(instancia, linea):
         return True
 
     
-    # Agrego una encuesta de satisfaccion
-    busq = instancia.modulos['mm002_Encuestas'].buscar(venta_id=operacion_id)
-    if len(busq) != 0:
-        # si hay algun resultado, uso el primero
-        encuesta = busq[0]
-        existia_encuesta = True
-    else:
-        # Creo un objeto nuevo del modulo mm002_Encuestas.
-        encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
-        existia_encuesta = False
+    # Agrego una encuesta de satisfaccion solo si la sucursal no es GERENCIA
+    if datos[15] != 'GERENCIA':
+        busq = instancia.modulos['mm002_Encuestas'].buscar(venta_id=operacion_id)
+        if len(busq) != 0:
+            # si hay algun resultado, uso el primero
+            encuesta = busq[0]
+            existia_encuesta = True
+        else:
+            # Creo un objeto nuevo del modulo mm002_Encuestas.
+            encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
+            existia_encuesta = False
 
-    encuesta.importar_campo('venta_id', operacion_id)
-    encuesta.importar_campo('name', 'Encuesta de venta %s' % operacion_id)
+        encuesta.importar_campo('venta_id', operacion_id)
+        encuesta.importar_campo('name', 'Encuesta de venta %s' % operacion_id)
 
-    # defino la fecha de hoy:
-    hoy = datetime.datetime.today()
+        # defino la fecha de hoy:
+        hoy = datetime.datetime.today()
         
-    if datos[10] == '1' or datos[10] == '4':
-        # Es venta tradicional o usados
-        delta = 15
-    else:
-        # Sino, debe ser venta especial o planes
-        delta = 15
+        if datos[10] == '1' or datos[10] == '4':
+            # Es venta tradicional o usados
+            delta = 15
+        else:
+            # Sino, debe ser venta especial o planes
+            delta = 15
 
-    logger.debug("Antes de tocar encuesta")
+        logger.debug("Antes de tocar encuesta")
 
-    if datos[10] == '1' or datos[10] == '4' or datos[10] == '2':
-        tipo_venta_enc = '1'
-    elif datos[10] == '3':
-        tipo_venta_enc = '2'
-    else:
-        logger.error("Tipo de venta no soportado")
-        raise sugar.ErrorSugar("Tipo de venta codigo no soportado")
-    
-    if not existia_encuesta:
-        encuesta.importar_campo('tipo_encuesta', unicode(tipo_venta_enc, 'iso-8859-1'))
-        encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
+        if datos[10] == '1' or datos[10] == '4' or datos[10] == '2':
+            tipo_venta_enc = '1'
+        elif datos[10] == '3':
+            tipo_venta_enc = '2'
+        else:
+            logger.error("Tipo de venta no soportado")
+            raise sugar.ErrorSugar("Tipo de venta codigo no soportado")
+        
+        if not existia_encuesta:
+            encuesta.importar_campo('tipo_encuesta', unicode(tipo_venta_enc, 'iso-8859-1'))
+            encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
                                     datetime.timedelta(days=delta)).timetuple())
-        encuesta.importar_campo('encuesta_estado', 'No iniciada')
-        encuesta.importar_campo('fecha_facturacion', 
-                        objeto.obtener_campo('fecha_venta').a_sugar())
-    
-        encuesta.importar_campo('patenta_maipu', objeto.obtener_campo('patenta_maipu').a_sugar())
-
-        encuesta.importar_campo('name', operacion_id)
-        encuesta.importar_campo('assigned_user_name', usuario_asignado_n)
-        encuesta.importar_campo('assigned_user_id', usuario_asignado_id)
-
-        encuesta.importar_campo('marca', unicode(datos[4], 'iso-8859-1'))
-        encuesta.importar_campo('modelo', unicode(datos[6], 'iso-8859-1'))
+            encuesta.importar_campo('encuesta_estado', 'No iniciada')
+            encuesta.importar_campo('fecha_facturacion', 
+                            objeto.obtener_campo('fecha_venta').a_sugar())
         
-        encuesta.importar_campo('sucursal_descripcion',
-                                    unicode(datos[15], 'iso-8859-1'))
-        logger.debug("Sucursal de ENCUESTA: " + unicode(datos[15], 'iso-8859-1'))
+            encuesta.importar_campo('patenta_maipu', objeto.obtener_campo('patenta_maipu').a_sugar())
+    
+            encuesta.importar_campo('name', operacion_id)
+            encuesta.importar_campo('assigned_user_name', usuario_asignado_n)
+            encuesta.importar_campo('assigned_user_id', usuario_asignado_id)
+    
+            encuesta.importar_campo('marca', unicode(datos[4], 'iso-8859-1'))
+            encuesta.importar_campo('modelo', unicode(datos[6], 'iso-8859-1'))
+            
+            encuesta.importar_campo('sucursal_descripcion',
+                                        unicode(datos[15], 'iso-8859-1'))
+            logger.debug("Sucursal de ENCUESTA: " + unicode(datos[15], 'iso-8859-1'))
 
-        logger.debug("Grabando una nueva ENCUESTA...")
-        encuesta.grabar()
-
-        # Relaciono la encuesta creada con el cliente
-        instancia.relacionar(contacto, encuesta)
+            logger.debug("Grabando una nueva ENCUESTA...")
+            encuesta.grabar()
+    
+            # Relaciono la encuesta creada con el cliente
+            instancia.relacionar(contacto, encuesta)
+        
+    else:
+        logger.debug("No hay encuesta por ser venta de GERENCIA.")
     
     return True
 
