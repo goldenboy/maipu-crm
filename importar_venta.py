@@ -203,7 +203,7 @@ def procesar_linea(instancia, linea):
 
     
     # Agrego una encuesta de satisfaccion solo si la sucursal no es GERENCIA
-    if datos[15] != 'GERENCIA':
+    if not datos[15].startswith('GERENCIA'):
         busq = instancia.modulos['mm002_Encuestas'].buscar(venta_id=operacion_id)
         if len(busq) != 0:
             # si hay algun resultado, uso el primero
