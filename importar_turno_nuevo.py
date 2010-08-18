@@ -4,6 +4,7 @@ import monitor_config
 import logging
 import datetime
 import calendar
+import random
 
 ######################
 # Con este script doy de alta un turno nuevo en el sugar, y le indico a los
@@ -209,9 +210,12 @@ def procesar(instancia, pathname):
         
         llamada.grabar()
     
-    # Creo encuesta de satisfaccion si estoy en el estado 4    
+    # Creo encuesta de satisfaccion si estoy en el estado 4 y, en caso de ser
+    # un turno externo, en el 50% de los casos
+    al_azar = random.random()
     if pathname.split('/')[-1][0] == '4' and \
-            len(instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)) == 0:
+    len(instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)) == 0 \
+    and (al_azar < 0.5 or datos[24] == 'G'):
         logger.debug("Es una orden facturada. No existia encuesta")
         # Orden facturada. Agrego una encuesta de satisfaccion
         encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
@@ -247,6 +251,9 @@ def procesar(instancia, pathname):
 
     elif pathname.split('/')[-1][0] == '4':
         logger.debug("Es una orden facturada. Ya existia la encuesta")
+    
+    elif al_azar >= 0.5 and datos[24] != 'G':
+        logger.debug("Turno externo. No toca crear encuesta")
     
     
     if existe_cliente:
