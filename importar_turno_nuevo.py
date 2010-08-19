@@ -249,10 +249,10 @@ def procesar(instancia, pathname):
         # Relaciono la encuesta creada con el cliente
         instancia.relacionar(contacto, encuesta)
 
-    elif pathname.split('/')[-1][0] == '4':
+    elif pathname.split('/')[-1][0] == '4' and (al_azar < 0.5 or datos[24] == 'G'):
         logger.debug("Es una orden facturada. Ya existia la encuesta")
     
-    elif al_azar >= 0.5 and datos[24] != 'G':
+    elif pathname.split('/')[-1][0] == '4' and al_azar >= 0.5 and datos[24] != 'G':
         logger.debug("Turno externo. No toca crear encuesta")
     
     
