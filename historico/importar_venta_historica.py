@@ -5,20 +5,49 @@ import logging
 import datetime
 
 # Moneda
-
 currency_id = '9f4c22ed-f82e-9aa2-5f77-4c28f762e851'
 
 # Configuro el logging
 logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
-logger = logging.getLogger("importar_venta")
+logger = logging.getLogger("venta_historica")
+
 
 def procesar(instancia, pathname):
 
     # Leo el archivo de datos.
     arch_datos = open(pathname)
     datos = arch_datos.readlines()
+
+    ahora = datetime.datetime.now()
+    err_filename = ahora.isoformat()
     
-    return procesar_linea(instancia, datos[0])
+    hubo_errores = False
+
+    for linea in datos:
+        try:
+            ret = procesar_linea(instancia, linea)
+        except sugar.ErrorSugar, descripcion:
+            logger.error("Hubo error de tipo ErrorSugar: %s", str(descripcion))
+            ret = False
+        except ValueError:
+            ret = False
+        
+        if(not ret):
+            # Si hubo un error al procesar la linea del archivo
+            if(not hubo_errores):
+                errores = open('venta-historica-' + err_filename, 'w')
+            errores.write(linea)
+            errores.flush()
+            hubo_errores = True
+            logger.error("Hubo error: salida a %s" % err_filename)
+    
+    if(hubo_errores):
+        errores.close()
+    else:
+        logger.debug("No ocurrio ningun error. Aleluya.")
+    
+    return True
+
 
 
 def procesar_linea(instancia, linea):
