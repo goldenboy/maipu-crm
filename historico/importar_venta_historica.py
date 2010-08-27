@@ -59,7 +59,9 @@ def procesar_linea(instancia, linea):
     busq = instancia.modulos['mm002_Ventas'].buscar(operacion_id=datos[0])
     if len(busq) != 0:
         # si hay algun resultado, uso el primero
-        objeto = busq[0]
+        # objeto = busq[0]
+        logger.debug('La venta ya esta cargada')
+        return True
     else:
         # Creo un objeto nuevo del modulo Ventas.
         objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Ventas'])
@@ -137,7 +139,7 @@ def procesar_linea(instancia, linea):
     res = instancia.modulos['mm002_Modelo'].buscar(modelos_codigo=valor, marcas_codigo=valor_marca)
     if len(res) > 1:
         raise sugar.ErrorSugar('Hay modelos con ID duplicado')
-    elif len(res) == 0:
+    elif len(res) == 0 and not datos[6].isspace():
         # Debo crear un objeto modelo nuevo y agregarlo.
         obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Modelo'])
         obj_nuevo.importar_campo('modelos_codigo', valor)
@@ -156,7 +158,7 @@ def procesar_linea(instancia, linea):
     res = instancia.modulos['mm002_Catalogos'].buscar(modelos_codigo=valor_modelo, marcas_codigo=valor_marca, catalogos_codigo=valor)
     if len(res) > 1:
         raise sugar.ErrorSugar('Hay catalogos con ID duplicado')
-    elif len(res) == 0:
+    elif len(res) == 0 and not datos[8].isspace():
         # Debo crear un objeto catalogo nuevo y agregarlo.
         obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Catalogos'])
         obj_nuevo.importar_campo('modelos_codigo', valor_modelo)
@@ -192,7 +194,7 @@ def procesar_linea(instancia, linea):
     res = instancia.modulos['mm002_Sucursales'].buscar(sucursales_codigo=valor)
     if len(res) > 1:
         raise sugar.ErrorSugar('Hay sucursales con ID duplicado')
-    elif len(res) == 0:
+    elif len(res) == 0 and not datos[15].isspace():
         # Debo crear un objeto sucursal nuevo y agregarlo.
         obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Sucursales'])
         obj_nuevo.importar_campo('sucursales_codigo', valor)
