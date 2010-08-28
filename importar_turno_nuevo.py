@@ -223,6 +223,30 @@ def procesar(instancia, pathname):
         encuesta.importar_campo('tipo_encuesta', '0')
         encuesta.importar_campo('encuesta_estado', 'No iniciada')
         encuesta.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
+        
+        # Decidir a quien se le asigna la encuesta:
+        # Chevrolet (40) y Chery (50): mcaceres
+        # Ford (20): gfalchini
+        # VW (10), Audi (30) y Seat (31): rserradel y gserradel
+        if datos[17] in ['40', '50']:
+            logger.debug("Chevlolet o Chery: mcaceres")
+            usuario_asignado_n = 'mcaceres'
+            usuario_asignado_id = '5ec7ee9d-870d-fe0e-1527-4bdb4a4c24d0'
+        elif datos[17] == '20':
+            logger.debug("Ford: gfalchini")
+            usuario_asignado_n = 'gfalchini'
+            usuario_asignado_id = 'a3d3659f-443a-040a-c20b-4bd1a027069f'
+        elif datos[17] in ['10', '30', '31']:
+            logger.debug("VW, Audi o Seat. Entre rserradel y gserradel")
+            if random.random() >= 0.5:
+                usuario_asignado_n = 'rserradel'
+                usuario_asignado_id = '98e70a1b-0af0-1122-24cb-4bdf0a4ad845'
+            else:
+                usuario_asignado_n = 'gserradel'
+                usuario_asignado_id = 'e086b39b-3a4c-d5dc-53f9-4c1771f98bf8'
+        else:
+            logger.debug("La marca del servicio no es una de las posibles")
+        
         encuesta.importar_campo('assigned_user_name', usuario_asignado_n)
         encuesta.importar_campo('assigned_user_id', usuario_asignado_id)
         
