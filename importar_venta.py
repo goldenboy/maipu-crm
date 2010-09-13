@@ -261,7 +261,8 @@ def procesar_linea(instancia, linea):
                                         unicode(datos[15], 'iso-8859-1'))
             logger.debug("Sucursal de ENCUESTA: " + unicode(datos[15], 'iso-8859-1'))
             
-            encuesta.importar_campo('fecha_entrega',
+            if datos[20] != '00000000':
+                encuesta.importar_campo('fecha_entrega',
                                 objeto.obtener_campo('fecha_entrega').a_sugar())
 
             logger.debug("Grabando una nueva ENCUESTA...")
