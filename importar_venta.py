@@ -46,7 +46,7 @@ def procesar_linea(instancia, linea):
             'fecha_venta', 'tipo_venta_codigo', 'tipo_venta_descripcion',
             'vendedor_codigo', 'vendedor_nombre', 'sucursales_codigo',
             'sucursales_descripcion', 'gestor_codigo', 'gestor_nombre',
-            'patenta_maipu', 'importe']
+            'patenta_maipu', 'importe', 'fecha_entrega']
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
@@ -55,6 +55,9 @@ def procesar_linea(instancia, linea):
             objeto.importar_campo(campo[0], '1')
         elif campo[0] == 'patenta_maipu' and campo[1] != 'M':
             objeto.importar_campo(campo[0], '0')
+        elif (campo[0].startswith('fecha')) and campo[1] == '00000000':
+            # No importo el campo, lo dejo en blanco
+            pass
         else:
             objeto.importar_campo(campo[0], unicode(campo[1].rstrip(),
                                                             'iso-8859-1'))
@@ -257,6 +260,9 @@ def procesar_linea(instancia, linea):
             encuesta.importar_campo('sucursal_descripcion',
                                         unicode(datos[15], 'iso-8859-1'))
             logger.debug("Sucursal de ENCUESTA: " + unicode(datos[15], 'iso-8859-1'))
+            
+            encuesta.importar_campo('fecha_entrega',
+                                objeto.obtener_campo('fecha_entrega').a_sugar())
 
             logger.debug("Grabando una nueva ENCUESTA...")
             encuesta.grabar()
