@@ -46,7 +46,8 @@ def procesar_linea(instancia, linea):
             'fecha_venta', 'tipo_venta_codigo', 'tipo_venta_descripcion',
             'vendedor_codigo', 'vendedor_nombre', 'sucursales_codigo',
             'sucursales_descripcion', 'gestor_codigo', 'gestor_nombre',
-            'patenta_maipu', 'importe', 'fecha_entrega']
+            'patenta_maipu', 'importe', 'fecha_entrega', 'plan_grupo',
+            'plan_orden']
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
@@ -264,6 +265,13 @@ def procesar_linea(instancia, linea):
             if datos[20] != '00000000':
                 encuesta.importar_campo('fecha_entrega',
                                 objeto.obtener_campo('fecha_entrega').a_sugar())
+
+            # Agrego informacion de grupo y orden de planes
+            if tipo_venta_enc == '2':
+                encuesta.importar_campo('plan_grupo', \
+                                objeto.obtener_campo('plan_grupo').a_sugar())
+                encuesta.importar_campo('plan_orden', \
+                                objeto.obtener_campo('plan_orden').a_sugar())
 
             logger.debug("Grabando una nueva ENCUESTA...")
             encuesta.grabar()
