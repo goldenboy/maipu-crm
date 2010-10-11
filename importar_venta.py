@@ -243,8 +243,6 @@ def procesar_linea(instancia, linea):
         
         if not existia_encuesta:
             encuesta.importar_campo('tipo_encuesta', unicode(tipo_venta_enc, 'iso-8859-1'))
-            encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
-                                    datetime.timedelta(days=delta)).timetuple())
             encuesta.importar_campo('encuesta_estado', 'No iniciada')
             encuesta.importar_campo('fecha_facturacion', 
                             objeto.obtener_campo('fecha_venta').a_sugar())
@@ -263,8 +261,27 @@ def procesar_linea(instancia, linea):
             logger.debug("Sucursal de ENCUESTA: " + unicode(datos[15], 'iso-8859-1'))
             
             if datos[20] != '00000000':
+                # Si no viene el dato de la fecha de entrega
                 encuesta.importar_campo('fecha_entrega',
                                 objeto.obtener_campo('fecha_entrega').a_sugar())
+                encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
+                                    datetime.timedelta(days=delta)).timetuple())
+            else:
+                # Si esta la fecha de entrega, al dia siguiente se debe encuestar
+                dia_entrega = datetime.datetime.strptime(datos[20], '%Y%m%d')
+                if calendar.weekday(dia_entrega.year, dia_entrega.month,
+                                        dia_entrega.day) == 5:
+                    sig_habil = 2
+                elif alendar.weekday(dia_entrega.year, dia_entrega.month,
+                                        dia_entrega.day) == 4:
+                    sig_habil = 3
+                else:
+                    sig_habil = 1
+                
+                # Despues de sumarle uno o mas dias a la fecha de entrega para
+                # encuestar el siguiente dia habil, cargo la fecha de encuesta
+                encuesta.modificar_campo('fecha_tentativa_encuesta', (dia_entrega + 
+                                    datetime.timedelta(days=sig_habil)).timetuple())
 
             # Agrego informacion de grupo y orden de planes
             if tipo_venta_enc == '2':
