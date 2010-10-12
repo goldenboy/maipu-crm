@@ -271,6 +271,8 @@ def procesar_linea(instancia, linea):
         else:
             # Si esta la fecha de entrega, al dia siguiente se debe encuestar
             dia_entrega = time.strptime(datos[20], '%Y%m%d')
+            dia_entrega_dt = datetime.date(dia_entrega.tm_year,
+                                dia_entrega.tm_mon, dia_entrega.tm_mday)
             if calendar.weekday(dia_entrega.tm_year, dia_entrega.tm_mon,
                                     dia_entrega.tm_mday) == 5:
                 sig_habil = 2
@@ -282,7 +284,7 @@ def procesar_linea(instancia, linea):
                 
             # Despues de sumarle uno o mas dias a la fecha de entrega para
             # encuestar el siguiente dia habil, cargo la fecha de encuesta
-            encuesta.modificar_campo('fecha_tentativa_encuesta', (dia_entrega + 
+            encuesta.modificar_campo('fecha_tentativa_encuesta', (dia_entrega_dt + 
                                 datetime.timedelta(days=sig_habil)).timetuple())
 
         # Agrego informacion de grupo y orden de planes
