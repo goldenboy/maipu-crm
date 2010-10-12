@@ -264,12 +264,13 @@ def procesar_linea(instancia, linea):
         
         if datos[20] == '00000000':
             # Si no viene el dato de la fecha de entrega
-            encuesta.importar_campo('fecha_entrega',
-                            objeto.obtener_campo('fecha_entrega').a_sugar())
+            logger.debug("No hay dato de fecha de entrega")
             encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
                             datetime.timedelta(days=delta)).timetuple())
         else:
             # Si esta la fecha de entrega, al dia siguiente se debe encuestar
+            logger.debug("Uso la fecha de entrega " + datos[20])
+
             dia_entrega = time.strptime(datos[20], '%Y%m%d')
             dia_entrega_dt = datetime.date(dia_entrega.tm_year,
                                 dia_entrega.tm_mon, dia_entrega.tm_mday)
