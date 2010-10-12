@@ -47,7 +47,7 @@ def procesar_linea(instancia, linea):
             'vendedor_codigo', 'vendedor_nombre', 'sucursales_codigo',
             'sucursales_descripcion', 'gestor_codigo', 'gestor_nombre',
             'patenta_maipu', 'importe', 'fecha_entrega', 'plan_grupo',
-            'plan_orden', 'fecha_patentamiento', 'dominio']
+            'plan_orden', 'dominio', 'fecha_patentamiento']
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
