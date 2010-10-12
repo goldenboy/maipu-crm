@@ -243,9 +243,10 @@ def procesar_linea(instancia, linea):
             logger.error("Tipo de venta no soportado")
             raise sugar.ErrorSugar("Tipo de venta codigo no soportado")
         
-        #if not existia_encuesta:
+        if not existia_encuesta:
+            encuesta.importar_campo('encuesta_estado', 'No iniciada')
+        
         encuesta.importar_campo('tipo_encuesta', unicode(tipo_venta_enc, 'iso-8859-1'))
-        encuesta.importar_campo('encuesta_estado', 'No iniciada')
         encuesta.importar_campo('fecha_facturacion', 
                             objeto.obtener_campo('fecha_venta').a_sugar())
         
