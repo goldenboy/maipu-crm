@@ -215,7 +215,7 @@ def procesar(instancia, pathname):
     al_azar = random.random()
     if pathname.split('/')[-1][0] == '4' and \
     len(instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)) == 0 \
-    and (al_azar < 0.5 or datos[24] == 'G'):
+    and (al_azar < 0.5 or datos[24] == 'G' or True):
         logger.debug("Es una orden facturada. No existia encuesta")
         # Orden facturada. Agrego una encuesta de satisfaccion
         encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
@@ -273,7 +273,7 @@ def procesar(instancia, pathname):
         # Relaciono la encuesta creada con el cliente
         instancia.relacionar(contacto, encuesta)
 
-    elif pathname.split('/')[-1][0] == '4' and (al_azar < 0.5 or datos[24] == 'G'):
+    elif pathname.split('/')[-1][0] == '4' and (al_azar < 0.5 or datos[24] == 'G' or True):
         logger.debug("Es una orden facturada. Ya existia la encuesta")
     
     elif pathname.split('/')[-1][0] == '4' and al_azar >= 0.5 and datos[24] != 'G':
