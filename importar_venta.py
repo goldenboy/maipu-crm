@@ -47,7 +47,7 @@ def procesar_linea(instancia, linea):
             'vendedor_codigo', 'vendedor_nombre', 'sucursales_codigo',
             'sucursales_descripcion', 'gestor_codigo', 'gestor_nombre',
             'patenta_maipu', 'importe', 'fecha_entrega', 'plan_grupo',
-            'plan_orden']
+            'plan_orden', 'fecha_patentamiento', 'dominio']
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
@@ -241,58 +241,59 @@ def procesar_linea(instancia, linea):
             logger.error("Tipo de venta no soportado")
             raise sugar.ErrorSugar("Tipo de venta codigo no soportado")
         
-        if not existia_encuesta:
-            encuesta.importar_campo('tipo_encuesta', unicode(tipo_venta_enc, 'iso-8859-1'))
-            encuesta.importar_campo('encuesta_estado', 'No iniciada')
-            encuesta.importar_campo('fecha_facturacion', 
+        #if not existia_encuesta:
+        encuesta.importar_campo('tipo_encuesta', unicode(tipo_venta_enc, 'iso-8859-1'))
+        encuesta.importar_campo('encuesta_estado', 'No iniciada')
+        encuesta.importar_campo('fecha_facturacion', 
                             objeto.obtener_campo('fecha_venta').a_sugar())
         
-            encuesta.importar_campo('patenta_maipu', objeto.obtener_campo('patenta_maipu').a_sugar())
-    
-            encuesta.importar_campo('name', operacion_id)
-            encuesta.importar_campo('assigned_user_name', usuario_asignado_n)
-            encuesta.importar_campo('assigned_user_id', usuario_asignado_id)
-    
-            encuesta.importar_campo('marca', unicode(datos[4], 'iso-8859-1'))
-            encuesta.importar_campo('modelo', unicode(datos[6], 'iso-8859-1'))
+        encuesta.importar_campo('patenta_maipu', objeto.obtener_campo('patenta_maipu').a_sugar())
             
-            encuesta.importar_campo('sucursal_descripcion',
+        encuesta.importar_campo('name', operacion_id)
+        encuesta.importar_campo('assigned_user_name', usuario_asignado_n)
+        encuesta.importar_campo('assigned_user_id', usuario_asignado_id)
+        
+        encuesta.importar_campo('marca', unicode(datos[4], 'iso-8859-1'))
+        encuesta.importar_campo('modelo', unicode(datos[6], 'iso-8859-1'))
+        
+        encuesta.importar_campo('sucursal_descripcion',
                                         unicode(datos[15], 'iso-8859-1'))
-            logger.debug("Sucursal de ENCUESTA: " + unicode(datos[15], 'iso-8859-1'))
-            
-            if datos[20] != '00000000':
-                # Si no viene el dato de la fecha de entrega
-                encuesta.importar_campo('fecha_entrega',
-                                objeto.obtener_campo('fecha_entrega').a_sugar())
-                encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
-                                    datetime.timedelta(days=delta)).timetuple())
+        logger.debug("Sucursal de ENCUESTA: " + unicode(datos[15], 'iso-8859-1'))
+        
+        if datos[20] == '00000000':
+            # Si no viene el dato de la fecha de entrega
+            encuesta.importar_campo('fecha_entrega',
+                            objeto.obtener_campo('fecha_entrega').a_sugar())
+            encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
+                            datetime.timedelta(days=delta)).timetuple())
+        else:
+            # Si esta la fecha de entrega, al dia siguiente se debe encuestar
+            dia_entrega = datetime.datetime.strptime(datos[20], '%Y%m%d')
+            if calendar.weekday(dia_entrega.year, dia_entrega.month,
+                                    dia_entrega.day) == 5:
+                sig_habil = 2
+            elif alendar.weekday(dia_entrega.year, dia_entrega.month,
+                                    dia_entrega.day) == 4:
+                sig_habil = 3
             else:
-                # Si esta la fecha de entrega, al dia siguiente se debe encuestar
-                dia_entrega = datetime.datetime.strptime(datos[20], '%Y%m%d')
-                if calendar.weekday(dia_entrega.year, dia_entrega.month,
-                                        dia_entrega.day) == 5:
-                    sig_habil = 2
-                elif alendar.weekday(dia_entrega.year, dia_entrega.month,
-                                        dia_entrega.day) == 4:
-                    sig_habil = 3
-                else:
-                    sig_habil = 1
+                sig_habil = 1
                 
-                # Despues de sumarle uno o mas dias a la fecha de entrega para
-                # encuestar el siguiente dia habil, cargo la fecha de encuesta
-                encuesta.modificar_campo('fecha_tentativa_encuesta', (dia_entrega + 
-                                    datetime.timedelta(days=sig_habil)).timetuple())
+            # Despues de sumarle uno o mas dias a la fecha de entrega para
+            # encuestar el siguiente dia habil, cargo la fecha de encuesta
+            encuesta.modificar_campo('fecha_tentativa_encuesta', (dia_entrega + 
+                                datetime.timedelta(days=sig_habil)).timetuple())
 
-            # Agrego informacion de grupo y orden de planes
-            if tipo_venta_enc == '2':
-                encuesta.importar_campo('plan_grupo', \
-                                objeto.obtener_campo('plan_grupo').a_sugar())
-                encuesta.importar_campo('plan_orden', \
-                                objeto.obtener_campo('plan_orden').a_sugar())
+        # Agrego informacion de grupo y orden de planes
+        if tipo_venta_enc == '2':
+            encuesta.importar_campo('plan_grupo', \
+                            objeto.obtener_campo('plan_grupo').a_sugar())
+            encuesta.importar_campo('plan_orden', \
+                            objeto.obtener_campo('plan_orden').a_sugar())
 
-            logger.debug("Grabando una nueva ENCUESTA...")
-            encuesta.grabar()
-    
+        logger.debug("Grabando una nueva ENCUESTA...")
+        encuesta.grabar()
+        
+        if not existia_encuesta:
             # Relaciono la encuesta creada con el cliente
             instancia.relacionar(contacto, encuesta)
         
