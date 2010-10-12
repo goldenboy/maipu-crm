@@ -3,6 +3,8 @@ import crm_config
 import monitor_config
 import logging
 import datetime
+import time
+import calendar
 
 # Moneda
 
@@ -268,12 +270,12 @@ def procesar_linea(instancia, linea):
                             datetime.timedelta(days=delta)).timetuple())
         else:
             # Si esta la fecha de entrega, al dia siguiente se debe encuestar
-            dia_entrega = datetime.datetime.strptime(datos[20], '%Y%m%d')
-            if calendar.weekday(dia_entrega.year, dia_entrega.month,
-                                    dia_entrega.day) == 5:
+            dia_entrega = time.strptime(datos[20], '%Y%m%d')
+            if calendar.weekday(dia_entrega.tm_year, dia_entrega.tm_mon,
+                                    dia_entrega.tm_mday) == 5:
                 sig_habil = 2
-            elif alendar.weekday(dia_entrega.year, dia_entrega.month,
-                                    dia_entrega.day) == 4:
+            elif calendar.weekday(dia_entrega.tm_year, dia_entrega.tm_mon,
+                                    dia_entrega.tm_mday) == 4:
                 sig_habil = 3
             else:
                 sig_habil = 1
