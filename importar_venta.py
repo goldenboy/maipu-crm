@@ -288,6 +288,7 @@ def procesar_linea(instancia, linea):
             # encuestar el siguiente dia habil, cargo la fecha de encuesta
             encuesta.modificar_campo('fecha_tentativa_encuesta', (dia_entrega_dt + 
                                 datetime.timedelta(days=sig_habil)).timetuple())
+            encuesta.importar_campo('fecha_entrega', datos[20])
 
         # Agrego informacion de grupo y orden de planes
         if tipo_venta_enc == '2':
