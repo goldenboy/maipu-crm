@@ -173,7 +173,7 @@ def procesar_linea(instancia, linea):
     res = instancia.modulos['mm002_Sucursales'].buscar(sucursales_codigo=valor)
     if len(res) > 1:
         raise sugar.ErrorSugar('Hay sucursales con ID duplicado')
-    elif len(res) == 0:
+    elif len(res) == 0 and valor.strip() != '':
         # Debo crear un objeto sucursal nuevo y agregarlo.
         obj_nuevo = sugar.ObjetoSugar(instancia.modulos['mm002_Sucursales'])
         obj_nuevo.importar_campo('sucursales_codigo', valor)
@@ -209,7 +209,11 @@ def procesar_linea(instancia, linea):
 
     
     # Agrego una encuesta de satisfaccion solo si la sucursal no es GERENCIA
-    if not datos[15].startswith('GERENCIA'):
+    # y si la fecha de entrega no es anterior a la de venta (facturacion).
+    if not datos[15].startswith('GERENCIA') and \
+            (objeto.obtener_campo('fecha_entrega').valor is None or \
+            objeto.obtener_campo('fecha_venta').valor is None or \
+            objeto.obtener_campo('fecha_entrega').valor >= objeto.obtener_campo('fecha_venta').valor):
         busq = instancia.modulos['mm002_Encuestas'].buscar(venta_id=operacion_id)
         if len(busq) != 0:
             # si hay algun resultado, uso el primero
@@ -298,7 +302,7 @@ def procesar_linea(instancia, linea):
                             objeto.obtener_campo('plan_orden').a_sugar())
 
         logger.debug("Grabando una nueva ENCUESTA...")
-        encuesta.grabar()
+        logger.debug(encuesta.grabar())
         
         if not existia_encuesta:
             # Relaciono la encuesta creada con el cliente
