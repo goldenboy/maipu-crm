@@ -164,6 +164,15 @@ def procesar(instancia, pathname):
     objeto.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
 
 
+    # Cargo la descripcion de la sucursal en base al codigo que viene del
+    # archivo
+    logger.debug("Buscando sucursal")
+    res = instancia.modulos['mm002_Sucursales'].buscar(sucursales_codigo=datos[16])
+    if len(res) == 0:
+        objeto.importar_campo('sucursales_descripcion', u'')
+    else:
+        suc_desc = res[0].obtener_campo('sucursales_descripcion').a_sugar()
+        objeto.importar_campo('sucursales_descripcion', suc_desc)
 
     # Aqui ya estan creadas todas las entradas en Sugar de las cuales esta venta
     # depende. Ya puedo agrear el turno a la base de datos.
