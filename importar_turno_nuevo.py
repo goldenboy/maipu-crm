@@ -169,10 +169,12 @@ def procesar(instancia, pathname):
     logger.debug("Buscando sucursal")
     res = instancia.modulos['mm002_Sucursales'].buscar(sucursales_codigo=datos[16])
     if len(res) == 0:
-        objeto.importar_campo('sucursales_descripcion', u'')
+        logger.debug("Sin resultados al buscar sucursal")
     else:
+        logger.debug("Algun resultado al buscar sucursal")
         suc_desc = res[0].obtener_campo('sucursales_descripcion').a_sugar()
         objeto.importar_campo('sucursales_descripcion', suc_desc)
+        logger.debug("Luego de cargar descripcion de sucursal " + suc_desc)
 
     # Aqui ya estan creadas todas las entradas en Sugar de las cuales esta venta
     # depende. Ya puedo agrear el turno a la base de datos.
@@ -301,7 +303,7 @@ def obtener_instancia():
     instancia = sugar.InstanciaSugar(crm_config.WSDL_URL, crm_config.USUARIO,
                     crm_config.CLAVE, ['mm002_Turnos', 'mm002_Marcas',
                                         'mm002_Modelo', 'mm002_Encuestas',
-                                        'Contacts', 'Calls'],
+                                        'Contacts', 'Calls', 'mm002_Sucursales'],
                     crm_config.LDAP_KEY, crm_config.LDAP_IV)
 
     return instancia
