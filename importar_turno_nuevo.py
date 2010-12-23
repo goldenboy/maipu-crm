@@ -280,7 +280,8 @@ def procesar(instancia, pathname):
         logger.debug(encuesta.grabar())
 
         # Relaciono la encuesta creada con el cliente
-        instancia.relacionar(contacto, encuesta)
+        if existe_cliente:
+            instancia.relacionar(contacto, encuesta)
 
     elif pathname.split('/')[-1][0] == '4' and (al_azar < 0.5 or datos[24] == 'G' or True):
         logger.debug("Es una orden facturada. Ya existia la encuesta")
