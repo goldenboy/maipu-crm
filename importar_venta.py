@@ -10,10 +10,6 @@ import calendar
 
 currency_id = '9f4c22ed-f82e-9aa2-5f77-4c28f762e851'
 
-# A quien le asigno la encuesta
-usuario_asignado_n = 'eamuchastegui'
-usuario_asignado_id = '4df5932a-1f1f-c9e9-402d-4bd1a040dbed'
-
 # Configuro el logging
 logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
 logger = logging.getLogger("importar_venta")
@@ -29,6 +25,10 @@ def procesar(instancia, pathname):
 
 def procesar_linea(instancia, linea):
     
+    # A quien le asigno la encuesta
+    usuario_asignado_n = 'eamuchastegui'
+    usuario_asignado_id = '4df5932a-1f1f-c9e9-402d-4bd1a040dbed'
+
     # Leo el archivo de datos.
     datos = linea.split(';')
 

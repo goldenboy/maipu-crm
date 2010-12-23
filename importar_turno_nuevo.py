@@ -12,14 +12,6 @@ import random
 # sugar que presente los turnos del dia siguiente).
 ######################
 
-# A quien le asigno la encuesta
-usuario_asignado_n = 'eamuchastegui'
-usuario_asignado_id = '4df5932a-1f1f-c9e9-402d-4bd1a040dbed'
-
-# A quien le asigno los turnos
-usuario_asignado_n_tur = 'ndeamicis'
-usuario_asignado_id_tur = 'b017df97-18be-064a-a4ab-4bd1a04ff610'
-
 # Configuro el logging
 logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
 logger = logging.getLogger("importar_turno")
@@ -27,6 +19,14 @@ logger = logging.getLogger("importar_turno")
 
 def procesar(instancia, pathname):
     
+    # A quien le asigno la encuesta
+    usuario_asignado_n = 'eamuchastegui'
+    usuario_asignado_id = '4df5932a-1f1f-c9e9-402d-4bd1a040dbed'
+
+    # A quien le asigno los turnos
+    usuario_asignado_n_tur = 'ndeamicis'
+    usuario_asignado_id_tur = 'b017df97-18be-064a-a4ab-4bd1a04ff610'
+
 
     # Abro el archivo de datos.
     arch_datos = open(pathname)
@@ -282,7 +282,8 @@ def procesar(instancia, pathname):
         logger.debug(encuesta.grabar())
 
         # Relaciono la encuesta creada con el cliente
-        instancia.relacionar(contacto, encuesta)
+        if existe_cliente:
+            instancia.relacionar(contacto, encuesta)
 
     elif pathname.split('/')[-1][0] == '4' and (al_azar < 0.5 or datos[24] == 'G' or True):
         logger.debug("Es una orden facturada. Ya existia la encuesta")
