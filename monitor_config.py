@@ -7,6 +7,8 @@ DIR_EXITO = '/srv/CRM/exito'
 PLUGIN_DIRS = ['./']
 LOG_LEVEL = 'debug'
 
+MAIL_SNDR = 'sugarcrm@maipuautomotores.com.ar'
+MAIL_RCPT = 'lbarrueco@maipuautomotores.com.ar'
 
 
 # Configuracion de los scripts a invocar segun el path del archivo importado

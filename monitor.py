@@ -12,7 +12,11 @@ def main_loop():
 
     # Configuro el logging
     logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
+    handler = logging.handlers.SMTPHandler('localhost', \
+            monitor_config.MAIL_SNDR, monitor_config.MAIL_RCPT, 'Error Sugar')
     logger = logging.getLogger("monitor")
+    handler.setLevel(logging.ERROR)
+    logger.addHandler(handler)
 
     wm = pyinotify.WatchManager()  # Watch Manager
     mask = pyinotify.IN_CLOSE_WRITE  # watched events
@@ -76,7 +80,7 @@ def main_loop():
                         # importacion.
                         
                         # Doy mensaje de error
-                        logger.debug("Error en la importacion. "+ str(detalle))
+                        logger.error("Error en la importacion. "+ str(detalle))
                         
                         # Muevo el archivo a la carpeta de errores
                         logger.debug(event.pathname)
