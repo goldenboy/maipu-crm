@@ -4,7 +4,7 @@ def main_loop():
     import pyinotify
     import monitor_config
     import imp
-    import logging
+    import logging, logging.handlers
     import os
     from sugar import ErrorSugar
     import SOAPpy
