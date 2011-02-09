@@ -8,6 +8,7 @@ def main_loop():
     import os
     from sugar import ErrorSugar
     import SOAPpy
+    import sys, traceback
 
 
     # Configuro el logging
@@ -80,7 +81,9 @@ def main_loop():
                         # importacion.
                         
                         # Doy mensaje de error
-                        logger.error("Error en la importacion. "+ str(detalle))
+                        exc_type, exc_value, exc_traceback = sys.exc_info()
+                        logger.error("Error en la importacion del archivo %s. %s\n%s" % \
+                            (event.pathname, str(detalle), repr(traceback.format_exception(exc_type, exc_value, exc_traceback))))
                         
                         # Muevo el archivo a la carpeta de errores
                         logger.debug(event.pathname)
