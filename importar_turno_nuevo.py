@@ -180,7 +180,12 @@ def procesar(instancia, pathname):
     # depende. Ya puedo agrear el turno a la base de datos.
 
     logger.debug("Grabando un nuevo TURNO...")
-    logger.debug(objeto.grabar())
+    try:
+        objeto.grabar()
+    except ErrorSugar:
+        # Borro el campo DNI, lo presumo defectuoso, e intento nuevamente
+        objeto.importar_campo('cliente_dni', "")
+        logger.debug(objeto.grabar())
 
 
     if crear_llamada_recordatorio:
