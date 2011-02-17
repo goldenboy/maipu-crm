@@ -74,7 +74,8 @@ def procesar(instancia, pathname):
             valor_checkbox = (lambda x: x == 'G')(campo[1])
             logger.debug(campo[0] + ' -> ' + str(valor_checkbox))
             objeto.modificar_campo(campo[0].rstrip(), valor_checkbox)
-        elif (campo[0].startswith('fecha')) and campo[1] == '00000000':
+        elif ((campo[0].startswith('fecha')) and campo[1] == '00000000') or \
+                (campo[0] == 'cliente_dni' and campo[1].startswith('.')):
             # No importo este campo, lo dejo en blanco
             pass
         else:
