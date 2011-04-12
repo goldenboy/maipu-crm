@@ -156,6 +156,17 @@ class TipoSugar_enum(TipoSugar):
         else:
             raise ValueError
 
+class TipoSugar_multienum(TipoSugar_enum):
+    def __init__(self, valor_inicial = None, opciones = []):
+        # Inicializo el valor como el primer dato disponible en las opciones de
+        #  inicializacion, si no hay un valor inicial disponible.
+        if valor_inicial == None or opciones == None or valor_inicial not in opciones.keys():
+            self.valor = []
+        else:
+            self.valor = valor_inicial
+        
+        self.opciones = opciones
+
 
 class TipoSugar_varchar(TipoSugar):
     """Dato que almacena un string en SugarCRM."""
