@@ -32,6 +32,11 @@ def procesar_linea(instancia, linea):
     # Leo el archivo de datos.
     datos = linea.split(';')
 
+    # Si no hay operacion_id, ignoro este archivo
+    if datos[0].strip() == '':
+        logger.debug('Venta sin ID de operacion. Probablemente entrega a reventa.')
+	return True
+
     # Creo un objeto nuevo del modulo Ventas.
     busq = instancia.modulos['mm002_Ventas'].buscar(operacion_id=datos[0])
     if len(busq) != 0:
@@ -49,7 +54,8 @@ def procesar_linea(instancia, linea):
             'vendedor_codigo', 'vendedor_nombre', 'sucursales_codigo',
             'sucursales_descripcion', 'gestor_codigo', 'gestor_nombre',
             'patenta_maipu', 'importe', 'fecha_entrega', 'plan_grupo',
-            'plan_orden', 'dominio', 'fecha_patentamiento']
+            'plan_orden', 'dominio', 'fecha_patentamiento', 'fecha_apertura_c',
+            'fecha_reserva_c']
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
