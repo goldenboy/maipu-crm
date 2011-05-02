@@ -55,7 +55,7 @@ def procesar_linea(instancia, linea):
             'sucursales_descripcion', 'gestor_codigo', 'gestor_nombre',
             'patenta_maipu', 'importe', 'fecha_entrega', 'plan_grupo',
             'plan_orden', 'dominio', 'fecha_patentamiento', 'fecha_apertura_c',
-            'fecha_reserva_c']
+            'fecha_reserva_c', 'entrega_vehiculo']
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
     for campo in zip(campos, datos):
@@ -310,6 +310,27 @@ def procesar_linea(instancia, linea):
                             objeto.obtener_campo('plan_grupo').a_sugar())
             encuesta.importar_campo('plan_orden', \
                             objeto.obtener_campo('plan_orden').a_sugar())
+
+        # Agrego checkbox en encuesta si pasaron 5 días entre fecha de 
+        # facturacion y de patentamiento
+        try:
+            fecha_fact = time.strptime(datos[9], '%Y%m%d')
+            fecha_fact_dt = datetime.date(fecha_fact.tm_year, fecha_fact.tm_mon,
+                fecha_fact.tm_mday)
+            fecha_pat = time.strptime(datos[24], '%Y%m%d')
+            fecha_pat_dt = datetime.date(fecha_pat.tm_year, fecha_pat.tm_mon,
+                fecha_pat.tm_mday)
+            if fecha_pat_dt > fecha_fact_dt + datetime.timedelta(5):
+                # Pasaron mas de 5 dias
+                logger.debug("Pasaron + de 5 dias entre facturacion y entrega")
+                encuesta.modificar_campo('alerta_fact_patent_flag_c', True)
+            else:
+                logger.debug("Pasaron - de 5 dias entre facturacion y entrega")
+                encuesta.modificar_campo('alerta_fact_patent_flag_c', False)
+        except ValueError:
+            logger.debug("Capture ValueError en fecha de entrega o factura")
+            encuesta.modificar_campo('alerta_fact_patent_flag_c', False)
+
 
         logger.debug("Grabando una nueva ENCUESTA...")
         logger.debug(encuesta.grabar())
