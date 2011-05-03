@@ -311,7 +311,7 @@ def procesar_linea(instancia, linea):
             encuesta.importar_campo('plan_orden', \
                             objeto.obtener_campo('plan_orden').a_sugar())
 
-        # Agrego checkbox en encuesta si pasaron 5 días entre fecha de 
+        # Agrego checkbox en encuesta si pasaron 5 dias entre fecha de
         # facturacion y de patentamiento
         try:
             fecha_fact = time.strptime(datos[9], '%Y%m%d')
