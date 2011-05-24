@@ -54,7 +54,11 @@ def procesar(instancia, pathname):
             'sucursales_codigo',
             'marcas_codigo', 'marcas_descripcion', 'modelos_codigo', 'modelos_descripcion',
             'catalogos_codigo', 'catalogos_descripcion', 'orden_id', 'garantia',
-            'fecha_facturacion', 'importe']
+            'fecha_facturacion', 'importe', 'asesor_cita_codigo_c', 'asesor_cita_nombre_c',
+            'mecanico_uno_codigo_c', 'mecanico_uno_nombre_c',
+            'mecanico_dos_codigo_c', 'mecanico_dos_nombre_c',
+            'mecanico_tres_codigo_c', 'mecanico_tres_nombre_c',
+            'mecanico_cuatro_codigo_c', 'mecanico_cuatro_nombre_c']
     # hago copia y quito los elementos que no van al sugar
     campos_utiles = []
     for campo in campos:
