@@ -153,7 +153,7 @@ def procesar_linea(instancia, linea):
                         objeto.obtener_campo('catalogos_descripcion').a_sugar())
         cat_desc = objeto.obtener_campo('catalogos_descripcion').a_sugar()
         if cat_desc == '':
-            cat_desc = 'Sin descripcion'
+            cat_desc = u'Sin descripcion'
         obj_nuevo.importar_campo('name', cat_desc)
         logger.debug("Grabando un nuevo Catalogo...")
         obj_nuevo.grabar()
