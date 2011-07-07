@@ -237,7 +237,7 @@ def procesar(instancia, pathname):
     encuestas = instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)
     
     if pathname.split('/')[-1][0] == '4' and \
-    and (len(encuestas) > 0 or al_azar < 0.5 or datos[24] == 'G'):
+    (len(encuestas) > 0 or al_azar < 0.5 or datos[24] == 'G'):
         # Orden facturada. Y toca hacer encuesta de satisfaccion
         if len(encuestas) == 0:
             logger.debug("Es una orden facturada. No existia encuesta")
