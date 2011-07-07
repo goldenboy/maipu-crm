@@ -234,15 +234,23 @@ def procesar(instancia, pathname):
     # Creo encuesta de satisfaccion si estoy en el estado 4 y, en caso de ser
     # un turno externo, en el 50% de los casos
     al_azar = random.random()
+    encuestas = instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)
+    
     if pathname.split('/')[-1][0] == '4' and \
-    len(instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)) == 0 \
-    and (al_azar < 0.5 or datos[24] == 'G' or True):
-        logger.debug("Es una orden facturada. No existia encuesta")
-        # Orden facturada. Agrego una encuesta de satisfaccion
-        encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
+    and (len(encuestas) > 0 or al_azar < 0.5 or datos[24] == 'G'):
+        # Orden facturada. Y toca hacer encuesta de satisfaccion
+        if len(encuestas) == 0:
+            logger.debug("Es una orden facturada. No existia encuesta")
+            
+            encuesta = sugar.ObjetoSugar(instancia.modulos['mm002_Encuestas'])
+            encuesta.importar_campo('encuesta_estado', 'No iniciada')
+        else:
+            logger.debug("Es una orden facturada. YA existia encuesta")
+            
+            encuesta = encuestas[0]
+        
         encuesta.importar_campo('turno_id', operacion_id)
         encuesta.importar_campo('tipo_encuesta', '0')
-        encuesta.importar_campo('encuesta_estado', 'No iniciada')
         encuesta.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
         
         # Decidir a quien se le asigna la encuesta:
@@ -279,25 +287,23 @@ def procesar(instancia, pathname):
                             objeto.obtener_campo('garantia').valor)
         
         # Defino la fecha tentativa de encuesta
+        if len(encuestas) == 0:
+            hoy = datetime.datetime.today()
+            logger.debug("Hoy (fecha_facturacion): %s" % str(hoy))
+            manana = hoy + datetime.timedelta(days=3)
+            logger.debug("Maniana (fecha_tentativa_encuesta): %s" % str(manana))
+
+            encuesta.modificar_campo('fecha_tentativa_encuesta', manana.timetuple())
+            encuesta.modificar_campo('fecha_facturacion', hoy.timetuple())
+
         
-        hoy = datetime.datetime.today()
-        logger.debug("Hoy (fecha_facturacion): %s" % str(hoy))
-        manana = hoy + datetime.timedelta(days=3)
-        logger.debug("Maniana (fecha_tentativa_encuesta): %s" % str(manana))
-
-        encuesta.modificar_campo('fecha_tentativa_encuesta', manana.timetuple())
-        encuesta.modificar_campo('fecha_facturacion', hoy.timetuple())
-
-        logger.debug("Grabando una nueva ENCUESTA...")
+        logger.debug("Grabando la ENCUESTA...")
         logger.debug(encuesta.grabar())
 
         # Relaciono la encuesta creada con el cliente
         if existe_cliente:
             instancia.relacionar(contacto, encuesta)
 
-    elif pathname.split('/')[-1][0] == '4' and (al_azar < 0.5 or datos[24] == 'G' or True):
-        logger.debug("Es una orden facturada. Ya existia la encuesta")
-    
     elif pathname.split('/')[-1][0] == '4' and al_azar >= 0.5 and datos[24] != 'G':
         logger.debug("Turno externo. No toca crear encuesta")
     
