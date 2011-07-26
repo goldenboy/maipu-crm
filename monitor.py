@@ -61,7 +61,7 @@ def main_loop():
                                 break
 
                         if not modulo.procesar(instancia, event.pathname):
-                            raise ErrorSugar
+                            raise ErrorSugar('Ocurrio algun error en el procesamiento')
                     
                         # Si funciono correctamente, paso por aca.
                         # Muevo el archivo a la carpeta de exito
