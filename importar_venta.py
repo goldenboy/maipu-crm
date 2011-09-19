@@ -296,7 +296,14 @@ def procesar_linea(instancia, linea):
 
         # defino la fecha de hoy:
         hoy = datetime.datetime.today()
-        dia_t_enc_dt = hoy + datetime.timedelta(days=delta)
+        if datos[20] == '00000000':
+            dia_t_enc_dt = hoy + datetime.timedelta(days=delta)
+        else:
+            dia_entrega = time.strptime(datos[20], '%Y%m%d')
+            dia_entrega_dt = datetime.date(dia_entrega.tm_year,
+                                dia_entrega.tm_mon, dia_entrega.tm_mday)
+            dia_t_enc_dt = dia_entrega_dt
+
         if dia_t_enc_dt.weekday() == 5:
             sig_habil = 2
         elif dia_t_enc_dt.weekday() == 4:
