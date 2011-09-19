@@ -236,16 +236,6 @@ def procesar_linea(instancia, linea):
         encuesta.importar_campo('venta_id', operacion_id)
         encuesta.importar_campo('name', 'Encuesta de venta %s' % operacion_id)
 
-        # defino la fecha de hoy:
-        hoy = datetime.datetime.today()
-        
-        if datos[10] == '1' or datos[10] == '4':
-            # Es venta tradicional o usados
-            delta = 15
-        else:
-            # Sino, debe ser venta especial o planes
-            delta = 15
-
         logger.debug("Antes de tocar encuesta")
 
         if datos[10] == '1' or datos[10] == '4' or datos[10] == '2':
@@ -278,31 +268,48 @@ def procesar_linea(instancia, linea):
                                         unicode(datos[15], 'iso-8859-1'))
         logger.debug("Sucursal de ENCUESTA: " + unicode(datos[15], 'iso-8859-1'))
         
-        if datos[20] == '00000000':
-            # Si no viene el dato de la fecha de entrega
-            logger.debug("No hay dato de fecha de entrega")
-            encuesta.modificar_campo('fecha_tentativa_encuesta', (hoy + 
-                            datetime.timedelta(days=delta)).timetuple())
-        else:
-            # Si esta la fecha de entrega, al dia siguiente se debe encuestar
-            logger.debug("Uso la fecha de entrega " + datos[20])
 
-            dia_entrega = time.strptime(datos[20], '%Y%m%d')
-            dia_entrega_dt = datetime.date(dia_entrega.tm_year,
-                                dia_entrega.tm_mon, dia_entrega.tm_mday)
-            if calendar.weekday(dia_entrega.tm_year, dia_entrega.tm_mon,
-                                    dia_entrega.tm_mday) == 5:
-                sig_habil = 2
-            elif calendar.weekday(dia_entrega.tm_year, dia_entrega.tm_mon,
-                                    dia_entrega.tm_mday) == 4:
-                sig_habil = 3
+        if datos[10] == '1' or datos[10] == '4':
+            # Es venta tradicional o usados
+            if (datos[20] == '00000000'):
+                # SIN fecha de entrega
+                if (datos[27].strip() != 'MAIPU'):
+                    # SIN fecha de entrega y SIN entrega MAIPU
+                    delta = 15
             else:
-                sig_habil = 1
-                
-            # Despues de sumarle uno o mas dias a la fecha de entrega para
-            # encuestar el siguiente dia habil, cargo la fecha de encuesta
-            encuesta.modificar_campo('fecha_tentativa_encuesta', (dia_entrega_dt + 
-                                datetime.timedelta(days=sig_habil)).timetuple())
+                # CON fecha de entrega
+                if (datos[27].strip() != 'MAIPU'):
+                    # SIN entrea MAIPU
+                    if (datos[24] == '00000000'):
+                        # SIN fecha de patentamiento
+                        delta = 7
+                    else:
+                        # CON fecha de patentamiento
+                        delta = 3
+                else:
+                    # CON entrega MAIPU
+                    delta = 1
+        else:
+            # Sino, debe ser venta especial o planes
+            delta = 15
+
+
+        # defino la fecha de hoy:
+        hoy = datetime.datetime.today()
+        dia_t_enc_dt = hoy + datetime.timedelta(days=delta)
+        if dia_t_enc_dt.weekday() == 5:
+            sig_habil = 2
+        elif dia_t_enc_dt.weekday() == 4:
+            sig_habil = 3
+        else:
+            sig_habil = 1
+
+        # Despues de sumarle uno o mas dias a la fecha de entrega para
+        # encuestar el siguiente dia habil, cargo la fecha de encuesta
+        encuesta.modificar_campo('fecha_tentativa_encuesta', (dia_t_enc_dt +
+                            datetime.timedelta(days=sig_habil)).timetuple())
+
+        if datos[20] != '00000000':
             encuesta.importar_campo('fecha_entrega', datos[20])
 
         # Agrego informacion de grupo y orden de planes
