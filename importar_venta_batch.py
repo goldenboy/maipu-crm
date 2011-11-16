@@ -56,7 +56,7 @@ def obtener_instancia():
                     crm_config.CLAVE, ['mm002_Ventas', 'mm002_Marcas',
                                         'mm002_Modelo', 'mm002_Catalogos',
                                         'mm002_Tipo_venta', 'mm002_Sucursales',
-                                        'Contacts', 'mm002_Encuestas'],
+                                        'Contacts', 'mm002_Encuestas','Calls'],
                     crm_config.LDAP_KEY, crm_config.LDAP_IV)
 
     return instancia

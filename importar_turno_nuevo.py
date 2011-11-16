@@ -35,15 +35,38 @@ def procesar(instancia, pathname):
     linea = datos[0]
     datos = linea.split(';')
 
-    # Para cada turno a importar, hago una busqueda de Turnos por turno_id,
-    # por si los turnos fueron ingresados previamente
-    busq = instancia.modulos['mm002_Turnos'].buscar(turno_id=datos[0])
-    if len(busq) != 0:
-        # si hay algun resultado, uso el primero
-        objeto = busq[0]
+    # Verifico si el turno_id es '00000', entonces fue espontaneo
+    if int(datos[0]) != 0:
+        logger.debug("Es un turno PROGRAMADO (tiene id).")
+        espontaneo = False
+        # Para cada turno a importar, hago una busqueda de Turnos por turno_id,
+        # por si los turnos fueron ingresados previamente
+        busq = instancia.modulos['mm002_Turnos'].buscar(turno_id=datos[0])
+        if len(busq) != 0:
+            # si hay algun resultado, uso el primero
+            objeto = busq[0]
+        else:
+            # Creo un objeto nuevo del modulo Turnos.
+            objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Turnos'])
     else:
-        # Creo un objeto nuevo del modulo Turnos.
-        objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Turnos'])
+        logger.debug("Es un turno ESPONTANEO (no tiene id).")
+        espontaneo = True
+        # Me fijo si el turno ya estaba creado (debo buscar tanto por id de
+        #  orden como tipo de orden)
+        if datos[24] == 'G':
+            es_garantia = '1'
+        else:
+            es_garantia = '0'
+        busq = instancia.modulos['mm002_Turnos'].buscar(orden_id=datos[23],
+                                                        garantia=es_garantia)
+        if len(busq) != 0:
+            # si hay algun resultado, uso el primero
+            logger.debug("El turno ESPONTANEO ya existia, se actualiza.")
+            objeto = busq[0]
+        else:
+            # Creo un objeto nuevo del modulo Turnos.
+            logger.debug("El turno ESPONTANEO no existia, creo uno nuevo.")
+            objeto = sugar.ObjetoSugar(instancia.modulos['mm002_Turnos'])
 
     # Defino la plantilla con los campos.
     campos = ['turno_id', 'nombre_contacto', 'nombre_cliente',
@@ -78,7 +101,7 @@ def procesar(instancia, pathname):
             valor_checkbox = (lambda x: x == 'G')(campo[1])
             logger.debug(campo[0] + ' -> ' + str(valor_checkbox))
             objeto.modificar_campo(campo[0].rstrip(), valor_checkbox)
-        elif ((campo[0].startswith('fecha')) and campo[1] == '00000000') or \
+        elif ((campo[0].startswith('fecha')) and (campo[1] == '00000000' or campo[1].strip() == '')) or \
                 (campo[0] == 'cliente_dni' and campo[1].startswith('.')):
             # No importo este campo, lo dejo en blanco
             pass
@@ -165,8 +188,14 @@ def procesar(instancia, pathname):
     
     # Voy a darle un valor al campo 'name', utilizando el ID del turno
     logger.debug("Dando nombre al turno.")
-    operacion_id = objeto.obtener_campo('turno_id').a_sugar()
-    objeto.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
+    if not espontaneo:
+        operacion_id = objeto.obtener_campo('turno_id').a_sugar()
+        operacion_id_name = operacion_id
+        objeto.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
+    else:
+        operacion_id = objeto.obtener_campo('orden_id').a_sugar()
+        operacion_id_name = 'O' + datos[24] + '-' + objeto.obtener_campo('orden_id').a_sugar()
+        objeto.importar_campo('name', unicode(operacion_id_name, 'iso-8859-1'))
 
 
     # Cargo la descripcion de la sucursal en base al codigo que viene del
@@ -234,7 +263,7 @@ def procesar(instancia, pathname):
     # Creo encuesta de satisfaccion si estoy en el estado 4 y, en caso de ser
     # un turno externo, en el 50% de los casos
     al_azar = random.random()
-    encuestas = instancia.modulos['mm002_Encuestas'].buscar(turno_id=operacion_id)
+    encuestas = instancia.modulos['mm002_Encuestas'].buscar(name=operacion_id_name)
     
     if pathname.split('/')[-1][0] == '4':
         # Orden facturada. Y toca hacer encuesta de satisfaccion
@@ -250,7 +279,7 @@ def procesar(instancia, pathname):
         
         encuesta.importar_campo('turno_id', operacion_id)
         encuesta.importar_campo('tipo_encuesta', '0')
-        encuesta.importar_campo('name', unicode(operacion_id, 'iso-8859-1'))
+        encuesta.importar_campo('name', unicode(operacion_id_name, 'iso-8859-1'))
         
         # Decidir a quien se le asigna la encuesta:
         # Chevrolet (40) y Chery (50): mcaceres

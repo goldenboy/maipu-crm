@@ -14,6 +14,58 @@ currency_id = '9f4c22ed-f82e-9aa2-5f77-4c28f762e851'
 logging.basicConfig(level=monitor_config.LOG_LEVELS[monitor_config.LOG_LEVEL])
 logger = logging.getLogger("importar_venta")
 
+def llamada_prueba_manejo(instancia, contacto, operacion_id, venta):
+
+    usuario_asignado_name = 'jastudillo'
+    usuario_asignado_id = 'e2b4a923-6279-53ce-66f0-4de3b91bad97'
+    # Guardo el ID de sugar para mas tarde
+    contacto_id = contacto.obtener_campo('id').a_sugar()
+
+    marca = venta.obtener_campo('marcas_descripcion').a_sugar()
+    llamada_name = 'Prueba de manejo %s - %s'%(operacion_id, marca)
+
+    res = instancia.modulos['Calls'].buscar(parent_id=contacto_id, name=llamada_name)
+    if len(res) > 0:
+        logger.debug("Ya exite una llamada de prueba de manejo")
+        return
+
+    # Creo la llamada nueva
+    llamada = sugar.ObjetoSugar(instancia.modulos['Calls'])
+    logger.debug("Creo nueva llamada de prueba de manejo...")
+
+    llamada.importar_campo('status', 'Planned')
+    llamada.importar_campo('assigned_user_name', usuario_asignado_name)
+    llamada.importar_campo('assigned_user_id', usuario_asignado_id)
+    llamada.importar_campo('direction', 'Outbound')
+    llamada.importar_campo('parent_type', u'Contacts')
+    llamada.importar_campo('parent_id', contacto_id)
+    llamada.importar_campo('duration_hours', '0')
+    llamada.importar_campo('duration_minutes', '5')
+
+
+    # Fecha de llamada de prueba de manejo = now+1hs
+    fecha_venta = venta.obtener_campo('fecha_venta').valor
+    dia_venta = datetime.datetime.fromtimestamp(time.mktime(fecha_venta))
+    logger.debug("Prueba_Manejo: Fecha venta -> %s"%(dia_venta.isoformat(' ')))
+    hora = datetime.datetime.time(datetime.datetime.now())
+    logger.debug("Prueba_Manejo: Hora actual -> %s"%(hora))
+    
+    # Fecha de llamada de prueba de manejo = fecha_venta + 1 dia
+    delta_hora = datetime.timedelta(days=1, hours=hora.hour, minutes=hora.minute)
+    dia_llamada = dia_venta+delta_hora
+    logger.debug("Prueba_Manejo: Hora llamada -> %s "%(dia_llamada.isoformat(' ')))
+    llamada.modificar_campo('date_start', ((dia_llamada).timetuple()))
+
+    llamada.importar_campo('name', u'%s'%(llamada_name))
+
+    llamada.grabar()
+    logger.debug("Grabo nueva llamada de prueba de manejo...")
+
+    # Relaciono al contacto con la llamada
+    logger.debug("Relaciono llamada de prueba de manejo con Contacto")
+    instancia.relacionar(contacto, llamada)
+
+
 def procesar(instancia, pathname):
 
     # Leo el archivo de datos.
@@ -29,6 +81,9 @@ def procesar_linea(instancia, linea):
     usuario_asignado_n = 'eamuchastegui'
     usuario_asignado_id = '4df5932a-1f1f-c9e9-402d-4bd1a040dbed'
 
+    PRUEBA_MANEJO = False
+    FECHA_VENTA_PRUEBA_MANEJO = False
+
     # Leo el archivo de datos.
     datos = linea.split(';')
 
@@ -38,6 +93,7 @@ def procesar_linea(instancia, linea):
 	return True
 
     # Creo un objeto nuevo del modulo Ventas.
+    operacion_id=datos[0]
     busq = instancia.modulos['mm002_Ventas'].buscar(operacion_id=datos[0])
     if len(busq) != 0:
         # si hay algun resultado, uso el primero
@@ -56,15 +112,36 @@ def procesar_linea(instancia, linea):
             'patenta_maipu', 'importe', 'fecha_entrega', 'plan_grupo',
             'plan_orden', 'dominio', 'fecha_patentamiento', 'fecha_apertura_c',
             'fecha_reserva_c', 'entrega_vehiculo_c', 'entregador_codigo',
-            'entregador_nombre']
+            'entregador_nombre', 'codigo_reventa_c', 'nombre_reventa_c', 
+            'comision_reventa_c']
 
     # Cargo todos los valores importados en el objeto que entrara en sugar.
+    hoy = datetime.date.today().isoformat()
+    fecha_limite = (datetime.date.today()-datetime.timedelta(days=7)).isoformat()
     for campo in zip(campos, datos):
+	# Si la fecha de entrega no es valida, entonces seteo flag de creacion de llamada
+	if campo[0] == 'fecha_entrega':
+            try:
+                if not (int(campo[1].strip()) > 0 ):
+                    PRUEBA_MANEJO = True
+                    logger.debug("Debo crear llamada de prueba de manejo.")
+            except ValueError:
+                PRUEBA_MANEJO = True
+                logger.debug("Debo crear llamada de prueba de manejo.")
         logger.debug(campo[0] + ' -> ' + unicode(campo[1], 'iso-8859-1'))
         if campo[0] == 'patenta_maipu' and campo[1] == 'M':
             objeto.importar_campo(campo[0], '1')
         elif campo[0] == 'patenta_maipu' and campo[1] != 'M':
             objeto.importar_campo(campo[0], '0')
+        elif campo[0] == 'fecha_venta':
+            objeto.importar_campo(campo[0], unicode(campo[1].rstrip(),
+                                                            'iso-8859-1'))
+
+            fecha_venta= datetime.date.fromtimestamp(
+                time.mktime(time.strptime(campo[1],"%Y%m%d"))).isoformat()
+            if (fecha_limite <= fecha_venta <= hoy):
+                logger.debug("Fecha venta entre %s y %s"%(fecha_limite, hoy))
+                FECHA_VENTA_PRUEBA_MANEJO = True
         elif (campo[0].startswith('fecha')) and campo[1] == '00000000':
             # No importo el campo, lo dejo en blanco
             pass
@@ -100,7 +177,6 @@ def procesar_linea(instancia, linea):
 
     # Guardo el ID de sugar para mas tarde
     contact_id = contacto.obtener_campo('id').a_sugar()
-
 
     # Luego veo que la marca este cargada, y si no lo esta, la agrego.
     valor = objeto.obtener_campo('marcas_codigo').a_sugar()
@@ -209,6 +285,13 @@ def procesar_linea(instancia, linea):
     logger.debug("Relacionando venta con el cliente...")
     instancia.relacionar(contacto, objeto)
     logger.debug("Pase relacionar")
+
+    if PRUEBA_MANEJO and FECHA_VENTA_PRUEBA_MANEJO:
+        logger.debug("Voy a crear llamada de prueba de manejo.")
+        llamada_prueba_manejo(instancia, contacto, operacion_id, objeto)
+    else :
+        logger.debug("NO hay que crear llamada de prueba de manejo.")
+
 
     # No grabar la encuesta si la venta es anterior al 1/5/2010
     if objeto.obtener_campo('fecha_venta').valor <= \
@@ -367,7 +450,7 @@ def obtener_instancia():
                     crm_config.CLAVE, ['mm002_Ventas', 'mm002_Marcas',
                                         'mm002_Modelo', 'mm002_Catalogos',
                                         'mm002_Tipo_venta', 'mm002_Sucursales',
-                                        'Contacts', 'mm002_Encuestas'],
+                                        'Contacts', 'mm002_Encuestas','Calls'],
                     crm_config.LDAP_KEY, crm_config.LDAP_IV)
 
     return instancia
